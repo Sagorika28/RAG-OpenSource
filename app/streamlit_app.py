@@ -15,6 +15,10 @@ import json
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import streamlit as st
 
 # Add project root to path so imports work when running from app/ dir
@@ -38,7 +42,7 @@ def get_pipeline(config_path: str) -> QueryPipeline:
 # --------------------------------------------------------------------- #
 
 st.set_page_config(
-    page_title="RAG-OS — Technical Document Assistant",
+    page_title="RAG-Open Source - Technical Document Assistant",
     page_icon="🔍",
     layout="wide",
 )
@@ -55,10 +59,15 @@ with st.sidebar:
     config_files = sorted(config_dir.glob("*.yaml")) if config_dir.exists() else []
     config_names = [f.name for f in config_files]
 
+    try:
+        default_idx = config_names.index("groq.yaml")
+    except ValueError:
+        default_idx = 0
+
     selected_config = st.selectbox(
         "Config profile",
         config_names,
-        index=0 if config_names else None,
+        index=default_idx,
         help="Select cpu.yaml for local CPU mode or gpu.yaml for GPU mode",
     )
 
@@ -161,7 +170,7 @@ if query and selected_config:
                 header = f"**[{i}]** {source}"
                 if section:
                     header += f" — {section}"
-                header += f" (pp {page_start}-{page_end})"
+                # header += f" (pp {page_start}-{page_end})"
                 if doc_type:
                     header += f" `{doc_type}`"
 
@@ -186,7 +195,7 @@ if query and selected_config:
                         "Rank": cit["rank"],
                         "Source": cit["source"],
                         "Section": cit["section"],
-                        "Pages": cit["pages"],
+                        # "Pages": cit["pages"],
                         "Score": cit["score"],
                     })
                 st.table(citations_data)

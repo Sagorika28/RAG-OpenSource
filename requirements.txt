@@ -27,3 +27,5 @@ streamlit>=1.40.0
 
 # --- Utilities ---
 tqdm>=4.66.0
+groq
+python-dotenv

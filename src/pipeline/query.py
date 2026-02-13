@@ -65,12 +65,17 @@ class QueryPipeline:
     def _get_generator(self):
         if self._generator is None:
             cfg = get_section(self.config, "generation")
-            if cfg.get("enabled", True):
-                from src.generation.ollama_llm import OllamaGenerator
-                self._generator = OllamaGenerator(cfg)
-            else:
+            if not cfg.get("enabled", True):
                 from src.generation.none import NoGenerator
                 self._generator = NoGenerator(cfg)
+            else:
+                provider = cfg.get("provider", "ollama").lower()
+                if provider == "groq":
+                    from src.generation.groq_llm import GroqGenerator
+                    self._generator = GroqGenerator(cfg)
+                else:
+                    from src.generation.ollama_llm import OllamaGenerator
+                    self._generator = OllamaGenerator(cfg)
         return self._generator
 
     # ------------------------------------------------------------------ #
@@ -175,6 +180,9 @@ def main():
 
     from src.core.config import load_config
     from src.core.utils import setup_logging
+    from dotenv import load_dotenv
+
+    load_dotenv()
 
     parser = argparse.ArgumentParser(
         description="Query the RAG-OS pipeline"

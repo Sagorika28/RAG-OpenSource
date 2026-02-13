@@ -17,6 +17,6 @@ pip-delete-this-directory.txt
 .env
 
 # RAG-OS specific
-qdrant_data/
+# qdrant_data/  <-- Uncomment to deploy index
 # data/pdfs/  <-- Uncomment if you DON'T want to track PDFs in git
 logs/
