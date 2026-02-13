@@ -1,5 +1,5 @@
 """
-src/eval/run_eval.py — Evaluation runner.
+src/eval/run_eval.py — Evaluation runner (v2: reusable pipeline support).
 
 CLI entry point that:
   1. Loads config + eval dataset
