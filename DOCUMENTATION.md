@@ -79,7 +79,7 @@ Measured on Apple Silicon (M2/M4) with Groq API (Llama 3.3 70B):
 |--------|-----|------|------|
 | **Recall** | 66.7% | **100%** | **100%** |
 | **MRR** | 66.7% | 83.3% | 83.3% |
-| **nDCG** | 66.7% | 142% | 210% |
+| **nDCG** | 66.7% | 87.7% | 87.7% |
 
 ### Generation Quality (LLM-as-a-Judge)
 Answers are evaluated automatically using an LLM judge that scores on three dimensions (0–5):
