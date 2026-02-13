@@ -1,0 +1,546 @@
+{
+  "config_file": "data/eval/questions_robust.jsonl",
+  "num_queries": 20,
+  "k_values": [
+    1,
+    3,
+    5
+  ],
+  "retrieval_metrics": {
+    "recall@1": 0.5,
+    "mrr@1": 0.5,
+    "ndcg@1": 0.5,
+    "recall@3": 0.6,
+    "mrr@3": 0.55,
+    "ndcg@3": 0.5631,
+    "recall@5": 0.75,
+    "mrr@5": 0.5825,
+    "ndcg@5": 0.6233
+  },
+  "generation_metrics": {},
+  "latency_summary": {
+    "embed_ms": {
+      "mean": 339.71,
+      "p50": 23.0,
+      "p95": 6366.32,
+      "min": 12.6,
+      "max": 6366.32
+    },
+    "rerank_ms": {
+      "mean": 2776.36,
+      "p50": 2976.32,
+      "p95": 4524.63,
+      "min": 1213.85,
+      "max": 4524.63
+    },
+    "rewrite_ms": {
+      "mean": 417.6,
+      "p50": 417.7,
+      "p95": 877.01,
+      "min": 265.31,
+      "max": 877.01
+    },
+    "search_ms": {
+      "mean": 3.83,
+      "p50": 3.76,
+      "p95": 6.46,
+      "min": 2.82,
+      "max": 6.46
+    }
+  },
+  "index_stats": {
+    "collection": "rag_os_chunks",
+    "points_count": 4214,
+    "status": "green",
+    "vector_size": 384
+  },
+  "per_query_results": [
+    {
+      "question": "What are the necessary steps or checks that I must perform before installing a new refrigeration or air conditioning system to be considered competent on the job?",
+      "gold_sources": [
+        "0045_Sr. Technician RACW_ELE_Q3105_v4.0.pdf"
+      ],
+      "retrieved_sources": [
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0016_8-Study-on-Public-Procurement-Policies-Hiring-Trained-and-certified-technicians.pdf",
+        "0046_MC_Sr. Technician RACW Refrigeration Air Conditioning & Washing   Machine_V4.pdf",
+        "0029_6-NewsTRAC.pdf",
+        "0006_newsTRAC-4th-Edition-March-2025.pdf",
+        "0046_MC_Sr. Technician RACW Refrigeration Air Conditioning & Washing   Machine_V4.pdf",
+        "0016_8-Study-on-Public-Procurement-Policies-Hiring-Trained-and-certified-technicians.pdf",
+        "0045_Sr. Technician RACW_ELE_Q3105_v4.0.pdf",
+        "0029_6-NewsTRAC.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 877.01,
+        "embed_ms": 6366.32,
+        "search_ms": 6.46,
+        "rerank_ms": 4524.63
+      }
+    },
+    {
+      "question": "What factors are contributing to service delays and slower roll-out of low-GWP alternative technologies in the transport refrigeration sector outside of major cities?",
+      "gold_sources": [
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf"
+      ],
+      "retrieved_sources": [
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 424.43,
+        "embed_ms": 29.23,
+        "search_ms": 3.42,
+        "rerank_ms": 2977.39
+      }
+    },
+    {
+      "question": "What page number contains the table providing an overview of sectorial refrigerants distribution?",
+      "gold_sources": [
+        "0027_4-GHG-Report.pdf"
+      ],
+      "retrieved_sources": [
+        "0006_newsTRAC-4th-Edition-March-2025.pdf",
+        "0006_newsTRAC-4th-Edition-March-2025.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "newsTRAC Jan 18 Issue.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 495.23,
+        "embed_ms": 25.87,
+        "search_ms": 4.5,
+        "rerank_ms": 2927.12
+      }
+    },
+    {
+      "question": "What specific safety guidelines and standards are required for the transportation and handling of pharmaceutical products in the refrigeration sector?",
+      "gold_sources": [
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf"
+      ],
+      "retrieved_sources": [
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 429.6,
+        "embed_ms": 22.19,
+        "search_ms": 4.21,
+        "rerank_ms": 2968.66
+      }
+    },
+    {
+      "question": "What information is provided in the Assessment Criteria section of the manual on pages 1 through 26 of the 0047_ELE_Q3501_v4.0.pdf document?",
+      "gold_sources": [
+        "0047_ELE_Q3501_v4.0.pdf"
+      ],
+      "retrieved_sources": [
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0047_ELE_Q3501_v4.0.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0047_ELE_Q3501_v4.0.pdf",
+        "0046_MC_Sr. Technician RACW Refrigeration Air Conditioning & Washing   Machine_V4.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 265.31,
+        "embed_ms": 17.33,
+        "search_ms": 3.35,
+        "rerank_ms": 2986.44
+      }
+    },
+    {
+      "question": "What type of returns are enterprises required to submit online on a regular basis for ODS compliance?",
+      "gold_sources": [
+        "0024_1-Success-Story-Book-2022.pdf"
+      ],
+      "retrieved_sources": [
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf",
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf",
+        "0029_6-NewsTRAC.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 274.43,
+        "embed_ms": 17.76,
+        "search_ms": 3.31,
+        "rerank_ms": 1429.24
+      }
+    },
+    {
+      "question": "What are the six thematic areas that the India Cooling Action Plan has identified for implementing its recommendations?",
+      "gold_sources": [
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf"
+      ],
+      "retrieved_sources": [
+        "0027_4-GHG-Report.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0008_2-Action-Plan-for-implementation-of-recommendations-of-ICAP-\u2013-Transport-Air-Conditioning-Sector.pdf",
+        "0008_2-Action-Plan-for-implementation-of-recommendations-of-ICAP-\u2013-Transport-Air-Conditioning-Sector.pdf",
+        "0029_6-NewsTRAC.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0016_8-Study-on-Public-Procurement-Policies-Hiring-Trained-and-certified-technicians.pdf",
+        "0029_6-NewsTRAC.pdf",
+        "0021_NewsTRACDecember-2022-Issue-2nd.pdf",
+        "News TRAC Quarterly 3rd Edition.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 270.22,
+        "embed_ms": 12.6,
+        "search_ms": 2.82,
+        "rerank_ms": 2966.06
+      }
+    },
+    {
+      "question": "What years have the ODS Regulation & Control Rules been amended since their initial implementation in 2000?",
+      "gold_sources": [
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf"
+      ],
+      "retrieved_sources": [
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0024_1-Success-Story-Book-2022.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 417.7,
+        "embed_ms": 27.79,
+        "search_ms": 3.33,
+        "rerank_ms": 1268.97
+      }
+    },
+    {
+      "question": "What organization has undertaken a comprehensive public awareness campaign to inform industries and the public about the effects of ozone depletion?",
+      "gold_sources": [
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf"
+      ],
+      "retrieved_sources": [
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf",
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0029_6-NewsTRAC.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 410.96,
+        "embed_ms": 26.19,
+        "search_ms": 4.03,
+        "rerank_ms": 3002.64
+      }
+    },
+    {
+      "question": "What are the primary limitations of using ammonia as a refrigerant in densely populated buildings, despite its high efficiency and zero GWP?",
+      "gold_sources": [
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf"
+      ],
+      "retrieved_sources": [
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0006_newsTRAC-4th-Edition-March-2025.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0026_3-Passive-and-low-energy-cooling-strategies.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 311.33,
+        "embed_ms": 22.65,
+        "search_ms": 3.91,
+        "rerank_ms": 2971.97
+      }
+    },
+    {
+      "question": "At which Ex-Com meeting was it decided that the MLF Secretariat should present a total package including a proposal for review of the existing reporting formats?",
+      "gold_sources": [
+        "0024_1-Success-Story-Book-2022.pdf"
+      ],
+      "retrieved_sources": [
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0024_1-Success-Story-Book-2022.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 300.06,
+        "embed_ms": 18.45,
+        "search_ms": 3.58,
+        "rerank_ms": 2983.83
+      }
+    },
+    {
+      "question": "What opportunities does India have to strengthen its progress in adopting low-GWP alternative technologies for chillers in large air conditioning buildings?",
+      "gold_sources": [
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf"
+      ],
+      "retrieved_sources": [
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 313.85,
+        "embed_ms": 21.95,
+        "search_ms": 3.76,
+        "rerank_ms": 2976.32
+      }
+    },
+    {
+      "question": "What percentage of India's total CFC consumption was attributed to the RAC sector in 1991?",
+      "gold_sources": [
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf"
+      ],
+      "retrieved_sources": [
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0021_NewsTRACDecember-2022-Issue-2nd.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf",
+        "0029_6-NewsTRAC.pdf",
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf",
+        "0026_3-Passive-and-low-energy-cooling-strategies.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 337.19,
+        "embed_ms": 23.0,
+        "search_ms": 3.95,
+        "rerank_ms": 2970.23
+      }
+    },
+    {
+      "question": "What areas can be improved in the refrigerated transport sector according to global safety standards?",
+      "gold_sources": [
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf"
+      ],
+      "retrieved_sources": [
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 534.59,
+        "embed_ms": 21.41,
+        "search_ms": 3.47,
+        "rerank_ms": 2962.59
+      }
+    },
+    {
+      "question": "What type of training is required for technicians to operate refrigeration systems using ammonia or hydrocarbons safely and effectively?",
+      "gold_sources": [
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf"
+      ],
+      "retrieved_sources": [
+        "0016_8-Study-on-Public-Procurement-Policies-Hiring-Trained-and-certified-technicians.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0006_newsTRAC-4th-Edition-March-2025.pdf",
+        "0006_newsTRAC-4th-Edition-March-2025.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0029_6-NewsTRAC.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0029_6-NewsTRAC.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 468.02,
+        "embed_ms": 25.6,
+        "search_ms": 4.02,
+        "rerank_ms": 3003.62
+      }
+    },
+    {
+      "question": "What is the primary function of the thermal paste applied to the outdoor PCB in an air conditioning unit?",
+      "gold_sources": [
+        "0012_6-3rd-Edition-of-News-TRAC-Quarterly-News-magazine-for-RAC-Technicians.pdf"
+      ],
+      "retrieved_sources": [
+        "0012_6-3rd-Edition-of-News-TRAC-Quarterly-News-magazine-for-RAC-Technicians.pdf",
+        "News TRAC Quarterly 3rd Edition.pdf",
+        "0011_5-Passive-Cooling-Strategies-for-Sustainable-Buildings.pdf",
+        "0011_5-Passive-Cooling-Strategies-for-Sustainable-Buildings.pdf",
+        "0043_Voltas_2025_Line_Up_Range_Catalog_v1_01012025.pdf",
+        "0011_5-Passive-Cooling-Strategies-for-Sustainable-Buildings.pdf",
+        "0026_3-Passive-and-low-energy-cooling-strategies.pdf",
+        "0011_5-Passive-Cooling-Strategies-for-Sustainable-Buildings.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0026_3-Passive-and-low-energy-cooling-strategies.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 461.43,
+        "embed_ms": 18.1,
+        "search_ms": 3.36,
+        "rerank_ms": 2993.77
+      }
+    },
+    {
+      "question": "What units are used to express the total cooling capacity of an HVAC system according to the provided standards and system attributes?",
+      "gold_sources": [
+        "0016_8-Study-on-Public-Procurement-Policies-Hiring-Trained-and-certified-technicians.pdf"
+      ],
+      "retrieved_sources": [
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0012_6-3rd-Edition-of-News-TRAC-Quarterly-News-magazine-for-RAC-Technicians.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0010_4-Guidebook-for-Selection-of-Sustainable-Refrigeration-and-Air-Conditioning-Equipment.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 416.84,
+        "embed_ms": 22.76,
+        "search_ms": 4.43,
+        "rerank_ms": 3013.63
+      }
+    },
+    {
+      "question": "What are the main elements that make up a typical cold chain infrastructure for maintaining perishable products within controlled parameters?",
+      "gold_sources": [
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf"
+      ],
+      "retrieved_sources": [
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 383.62,
+        "embed_ms": 23.61,
+        "search_ms": 4.07,
+        "rerank_ms": 2168.44
+      }
+    },
+    {
+      "question": "What do the colors purple, blue, yellow, and red represent in the false-color view of total ozone over the Antarctic pole?",
+      "gold_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "retrieved_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0007_1-26th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0012_6-3rd-Edition-of-News-TRAC-Quarterly-News-magazine-for-RAC-Technicians.pdf",
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 510.58,
+        "embed_ms": 28.28,
+        "search_ms": 3.37,
+        "rerank_ms": 1213.85
+      }
+    },
+    {
+      "question": "What is the global warming potential of the carbon dioxide refrigerant used in Carrier Transicold's NaturaLINE container refrigeration unit?",
+      "gold_sources": [
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf"
+      ],
+      "retrieved_sources": [
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf",
+        "0003_Study-on-Low-GWP-alternative-Technologies-for-Chillers-in-Large-Air-Conditioning-Building.pdf",
+        "0005_Study-on-Low-GWP-alternative-Technologies-in-the-Transport-Refrigeration-Sector-for-web.pdf"
+      ],
+      "answer": "(skipped)",
+      "timings": {
+        "rewrite_ms": 449.59,
+        "embed_ms": 23.1,
+        "search_ms": 3.32,
+        "rerank_ms": 3217.76
+      }
+    }
+  ]
+}

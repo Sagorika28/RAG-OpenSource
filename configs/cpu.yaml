@@ -76,5 +76,5 @@ generation:
 
 data:
   pdf_dir: ./data/pdfs
-  eval_file: ./data/eval/questions.jsonl
+  eval_file: ./data/eval/questions_robust.jsonl
   output_dir: ./outputs
