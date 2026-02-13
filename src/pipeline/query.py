@@ -84,15 +84,14 @@ class QueryPipeline:
     # ------------------------------------------------------------------ #
 
     REWRITE_PROMPT = (
-        "You are a query expansion engine for a technical HVAC/refrigerant knowledge base. "
-        "A field technician has typed a short, vague query. Your job is to rewrite it into "
-        "a richer search query that will retrieve the most relevant technical procedures, "
-        "safety guidelines, and specifications.\n\n"
+        "You are a search query optimizer for a technical HVAC and refrigerant knowledge base. "
+        "A technician has typed a short, vague query. Your job is to expand it into a set of "
+        "technical search terms that help find the most relevant manual sections or procedures.\n\n"
         "Rules:\n"
         "- Keep the original intent.\n"
-        "- Add related technical terms: procedures, tools, refrigerant types, safety steps.\n"
-        "- Output ONLY the rewritten query (one paragraph, no explanation).\n"
-        "- Do NOT answer the question, just expand the search terms.\n"
+        "- Add 3-5 relevant technical categories or concepts (e.g., 'leak detection', 'safety standards', 'servicing procedures').\n"
+        "- Do NOT provide an exhaustive list of every possible refrigerant or tool.\n"
+        "- Output ONLY the expanded query string.\n"
     )
 
     def _rewrite_query(self, query: str) -> str:
@@ -112,15 +111,34 @@ class QueryPipeline:
             resp = client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": self.REWRITE_PROMPT},
-                    {"role": "user", "content": f"Technician query: {query}"},
+                    {"role": "user", "content": f"Input: {query}\nOutput:"},
                 ],
                 model="llama-3.1-8b-instant",  # Fast model for rewriting
                 temperature=0.0,
                 max_tokens=150,
             )
             rewritten = resp.choices[0].message.content.strip()
+            
+            # Post-processing to remove common LLM conversational filler
+            cleanup_phrases = [
+                "The rewritten query is:",
+                "Rewritten query:",
+                "Expanded query:",
+                "Revised query:",
+                "Output:",
+                "Here is the expanded query:",
+                "Here is the rewritten query:",
+            ]
+            for phrase in cleanup_phrases:
+                if rewritten.lower().startswith(phrase.lower()):
+                    rewritten = rewritten[len(phrase):].strip()
+            
+            # Remove leading/trailing quotes often added by LLMs
+            rewritten = rewritten.strip(' "')
+
             # Sanity check: if rewrite is too long or empty, use original
             if not rewritten or len(rewritten) > 500:
+                logger.warning(f"Query rewrite sanity check failed: '{rewritten}'")
                 return query
             return rewritten
         except Exception as e:
