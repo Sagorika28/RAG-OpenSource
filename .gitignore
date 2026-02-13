@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Mac
+.DS_Store
+
+# Environment variables
+.env
+
+# RAG-OS specific
+qdrant_data/
+# data/pdfs/  <-- Uncomment if you DON'T want to track PDFs in git
+logs/
