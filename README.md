@@ -147,6 +147,35 @@ The system is config-driven. Switch between CPU and GPU profiles:
 | Qdrant | Local embedded | Server (Docker) |
 | Device | CPU | CUDA |
 
+## ☁️ Cloud Deployment (Streamlit Cloud)
+
+To deploy this app for free on **Streamlit Cloud** using Groq for fast inference:
+
+1.  **Fork/Push this repo to GitHub.**
+2.  **Get a Groq API Key** from [console.groq.com](https://console.groq.com).
+3.  **Deploy on Streamlit Cloud**:
+    - Connect your GitHub repo.
+    - In "Advanced settings" -> "Secrets", add:
+      ```toml
+      GROQ_API_KEY = "gsk_..."
+      ```
+4.  **Configuration**:
+    - The app defaults to `groq.yaml`.
+    - This config uses **Groq Cloud API** for generation (Instant speed).
+    - Embeddings run on CPU (Cloud) or MPS (Mac).
+
+### Local Setup with Groq
+To run locally with Groq (instead of Ollama):
+1.  Add your key to `.env`:
+    ```bash
+    GROQ_API_KEY=gsk_...
+    ```
+2.  Run with Groq config:
+    ```bash
+    streamlit run app/streamlit_app.py
+    # Select 'groq.yaml' in the sidebar
+    ```
+
 ## Evaluation
 
 The eval harness computes:
