@@ -14,6 +14,8 @@ from __future__ import annotations
 import json
 import logging
 import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Dict
 
@@ -70,12 +72,18 @@ def run_evaluation(
     per_query_results: list[dict] = []
     judge_inputs: list[dict] = []
 
+    per_query_results: list[dict] = [None] * len(examples)  # type: ignore
+    judge_inputs: list[dict] = []
+
     # Determine if generation should be enabled for LLM judge
     gen_cfg = config.get("generation", {})
     gen_enabled = gen_cfg.get("enabled", False)
 
-    for i, example in enumerate(examples):
-        logger.info(f"Eval [{i+1}/{len(examples)}]: {example.question[:80]}...")
+    def _process_example(idx: int, example: Any):
+        logger.info(f"Eval [{idx+1}/{len(examples)}]: {example.question[:80]}...")
+        
+        # Add a tiny staggered start to avoid hitting rate limits instantly
+        time.sleep(idx * 0.1)
 
         result = pipeline.run(
             query=example.question,
@@ -87,26 +95,59 @@ def run_evaluation(
             hit.chunk.metadata.get("source", "")
             for hit in result.hits
         ]
-        all_retrieved.append(retrieved_sources)
-        all_gold.append(example.gold_sources)
-        all_timings.append(result.timings)
-
-        # Collect inputs for LLM judge
-        if gen_enabled and result.answer:
-            judge_inputs.append({
-                "question": example.question,
-                "hits": result.hits,
-                "answer": result.answer,
-            })
-
-        # Per-query detail
-        per_query_results.append({
-            "question": example.question,
+        
+        # Return package for aggregation
+        return {
+            "idx": idx,
+            "retrieved_sources": retrieved_sources,
             "gold_sources": example.gold_sources,
-            "retrieved_sources": retrieved_sources[:10],
-            "answer": result.answer if gen_enabled else "(skipped)",
             "timings": result.timings,
-        })
+            "answer": result.answer,
+            "question": example.question,
+            "hits": result.hits,
+        }
+
+    # Run in parallel
+    max_workers = 4  # Balanced for CPU-bound reranker + IO-bound LLM
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(_process_example, i, ex)
+            for i, ex in enumerate(examples)
+        ]
+        
+        for future in futures:
+            try:
+                res = future.result()
+                idx = res["idx"]
+                
+                # Collect results in order
+                per_query_results[idx] = {
+                    "question": res["question"],
+                    "gold_sources": res["gold_sources"],
+                    "retrieved_sources": res["retrieved_sources"][:10],
+                    "answer": res["answer"] if gen_enabled else "(skipped)",
+                    "timings": res["timings"],
+                }
+                
+                # Aggregate for metrics
+                # We'll re-extract lists to maintain order
+                if gen_enabled and res["answer"]:
+                    judge_inputs.append({
+                        "question": res["question"],
+                        "hits": res["hits"],
+                        "answer": res["answer"],
+                        "idx": idx  # Store index to sort later if needed
+                    })
+            except Exception as e:
+                logger.error(f"Parallel eval failed for an example: {e}")
+
+    # Re-sort judge_inputs to maintain original order for report consistency
+    judge_inputs.sort(key=lambda x: x["idx"])
+
+    # Flatten for metric computation
+    all_retrieved = [r["retrieved_sources"] for r in per_query_results if r]
+    all_gold = [r["gold_sources"] for r in per_query_results if r]
+    all_timings = [r["timings"] for r in per_query_results if r]
 
     # Compute metrics
     retrieval_metrics = compute_retrieval_metrics(

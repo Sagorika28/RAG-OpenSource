@@ -15,6 +15,8 @@ import json
 import logging
 import os
 import re
+import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional
 
 from src.core.types import Hit
@@ -101,46 +103,69 @@ class LLMJudge:
             f"ANSWER:\n{answer}"
         )
 
-        try:
-            response = self.client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": JUDGE_PROMPT},
-                    {"role": "user", "content": user_content},
-                ],
-                model=self.model,
-                temperature=0.0,
-                max_tokens=200,
-            )
-            raw = response.choices[0].message.content.strip()
-            scores = self._parse_scores(raw)
-            return scores
+        max_retries = 3
+        retry_delay = 1.0
+        
+        for attempt in range(max_retries):
+            try:
+                response = self.client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": JUDGE_PROMPT},
+                        {"role": "user", "content": user_content},
+                    ],
+                    model=self.model,
+                    temperature=0.0,
+                    max_tokens=200,
+                )
+                raw = response.choices[0].message.content.strip()
+                scores = self._parse_scores(raw)
+                return scores
 
-        except Exception as e:
-            logger.error(f"LLM Judge failed: {e}")
-            return self._empty_scores()
+            except Exception as e:
+                # Handle rate limits (429) with retry
+                if "429" in str(e) and attempt < max_retries - 1:
+                    logger.warning(f"Judge Rate Limit hit (429). Retrying in {retry_delay}s...")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2
+                    continue
+                
+                logger.error(f"LLM Judge failed: {e}")
+                return self._empty_scores()
+        
+        return self._empty_scores()
 
     def evaluate_batch(
         self,
         results: List[Dict[str, Any]],
+        max_workers: int = 4,
     ) -> Dict[str, float]:
         """
         Evaluate a batch of results and return averaged scores.
-
-        Args:
-            results: List of dicts with keys: question, hits, answer.
-
-        Returns:
-            Averaged scores: {faithfulness, relevance, completeness, overall}.
+        Parallelizes calls to the LLM.
         """
         all_scores: List[Dict[str, Any]] = []
 
-        for r in results:
-            scores = self.evaluate(
-                question=r["question"],
-                context_hits=r["hits"],
-                answer=r["answer"],
-            )
-            all_scores.append(scores)
+        if not results:
+            return self._aggregate_scores([])
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Map results to evaluate function
+            futures = [
+                executor.submit(
+                    self.evaluate,
+                    question=r["question"],
+                    context_hits=r["hits"],
+                    answer=r["answer"]
+                )
+                for r in results
+            ]
+            
+            for future in futures:
+                try:
+                    all_scores.append(future.result())
+                except Exception as e:
+                    logger.error(f"Batch evaluation future failed: {e}")
+                    all_scores.append(self._empty_scores())
 
         return self._aggregate_scores(all_scores)
 

@@ -105,45 +105,54 @@ class QueryPipeline:
         if not api_key:
             return query
 
-        try:
-            from groq import Groq
-            client = Groq(api_key=api_key)
-            resp = client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": self.REWRITE_PROMPT},
-                    {"role": "user", "content": f"Input: {query}\nOutput:"},
-                ],
-                model="llama-3.1-8b-instant",  # Fast model for rewriting
-                temperature=0.0,
-                max_tokens=150,
-            )
-            rewritten = resp.choices[0].message.content.strip()
-            
-            # Post-processing to remove common LLM conversational filler
-            cleanup_phrases = [
-                "The rewritten query is:",
-                "Rewritten query:",
-                "Expanded query:",
-                "Revised query:",
-                "Output:",
-                "Here is the expanded query:",
-                "Here is the rewritten query:",
-            ]
-            for phrase in cleanup_phrases:
-                if rewritten.lower().startswith(phrase.lower()):
-                    rewritten = rewritten[len(phrase):].strip()
-            
-            # Remove leading/trailing quotes often added by LLMs
-            rewritten = rewritten.strip(' "')
+        max_retries = 3
+        retry_delay = 1.0
+        
+        for attempt in range(max_retries):
+            try:
+                from groq import Groq
+                client = Groq(api_key=api_key)
+                resp = client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": self.REWRITE_PROMPT},
+                        {"role": "user", "content": f"Input: {query}\nOutput:"},
+                    ],
+                    model="llama-3.1-8b-instant",  # Fast model for rewriting
+                    temperature=0.0,
+                    max_tokens=150,
+                )
+                rewritten = resp.choices[0].message.content.strip()
+                
+                # Post-processing to remove common LLM conversational filler
+                cleanup_phrases = [
+                    "The rewritten query is:",
+                    "Rewritten query:",
+                    "Expanded query:",
+                    "Revised query:",
+                    "Output:",
+                    "Here is the expanded query:",
+                    "Here is the rewritten query:",
+                ]
+                for phrase in cleanup_phrases:
+                    if rewritten.lower().startswith(phrase.lower()):
+                        rewritten = rewritten[len(phrase):].strip()
+                
+                # Remove leading/trailing quotes often added by LLMs
+                rewritten = rewritten.strip(' "')
 
-            # Sanity check: if rewrite is too long or empty, use original
-            if not rewritten or len(rewritten) > 500:
-                logger.warning(f"Query rewrite sanity check failed: '{rewritten}'")
+                # Sanity check: if rewrite is too long or empty, use original
+                if not rewritten or len(rewritten) > 500:
+                    logger.warning(f"Query rewrite sanity check failed: '{rewritten}'")
+                    return query
+                return rewritten
+            except Exception as e:
+                if "429" in str(e) and attempt < max_retries - 1:
+                    logger.warning(f"Query rewriter Rate Limit hit. Retrying in {retry_delay}s...")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2
+                    continue
+                logger.warning(f"Query rewrite failed, using original: {e}")
                 return query
-            return rewritten
-        except Exception as e:
-            logger.warning(f"Query rewrite failed, using original: {e}")
-            return query
 
     # ------------------------------------------------------------------ #
     #  Public API                                                         #

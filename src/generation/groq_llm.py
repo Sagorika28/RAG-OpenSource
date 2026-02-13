@@ -44,29 +44,42 @@ class GroqGenerator(BaseGenerator):
 
         context_str = self._build_context(context_hits)
         
-        try:
-            chat_completion = self.client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "system",
-                        "content": self.system_prompt,
-                    },
-                    {
-                        "role": "user",
-                        "content": f"Context:\n{context_str}\n\nQuestion: {query}",
-                    },
-                ],
-                model=self.model,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-            )
-            
-            answer = chat_completion.choices[0].message.content
-            return answer
+        max_retries = 3
+        retry_delay = 2.0
+        
+        for attempt in range(max_retries):
+            try:
+                chat_completion = self.client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": self.system_prompt,
+                        },
+                        {
+                            "role": "user",
+                            "content": f"Context:\n{context_str}\n\nQuestion: {query}",
+                        },
+                    ],
+                    model=self.model,
+                    temperature=self.temperature,
+                    max_tokens=self.max_tokens,
+                )
+                
+                answer = chat_completion.choices[0].message.content
+                return answer
 
-        except Exception as e:
-            logger.error(f"Groq generation failed: {e}")
-            return f"Error generating answer: {e}"
+            except Exception as e:
+                # Handle rate limits (429) with retry
+                if "429" in str(e) and attempt < max_retries - 1:
+                    logger.warning(f"Groq Rate Limit hit (429). Retrying in {retry_delay}s... (Attempt {attempt+1}/{max_retries})")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                    continue
+                
+                logger.error(f"Groq generation failed: {e}")
+                return f"Error generating answer: {e}"
+        
+        return "Error: Maximum retries exceeded for Groq generation."
 
     def _build_context(self, hits: List[Hit]) -> str:
         """Format retrieved chunks as numbered context for the prompt."""
