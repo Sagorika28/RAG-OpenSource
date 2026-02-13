@@ -26,10 +26,11 @@ qdrant:
 reranker:
   enabled: true
   model_name: BAAI/bge-reranker-v2-m3   # Upgraded from base for better intent matching
+  top_k: 10                              # Chunks passed to LLM (was 5)
   device: cpu
 
 retrieval:
-  top_k: 10
+  top_k: 20                              # Candidates for reranker (was 10)
   top_p: 0.9
   dedup_threshold: 0.9             # Jaccard similarity threshold (0.9 = 90% word overlap → duplicate)
   query_rewrite: true              # LLM expands vague queries before search

@@ -27,11 +27,11 @@ qdrant:
 reranker:
   enabled: false              # Toggle off for speed on CPU
   model_name: BAAI/bge-reranker-v2-m3   # Upgraded for better intent matching
-  top_k: 5                    # Re-rank top N hits
+  top_k: 10                    # Chunks passed to LLM (was 5)
   device: cpu
 
 retrieval:
-  top_k: 10                   # Number of candidates from vector search
+  top_k: 20                   # Candidates for reranker (was 10)
   dedup_threshold: 0.9        # Jaccard similarity threshold for dedup
   query_rewrite: true         # LLM expands vague queries before search
 
