@@ -20,6 +20,7 @@ from typing import Any, Dict
 from src.core.config import load_config
 from src.core.utils import setup_logging
 from src.eval.datasets import load_eval_dataset
+from src.eval.llm_judge import LLMJudge
 from src.eval.metrics import aggregate_latencies, compute_retrieval_metrics
 from src.pipeline.query import QueryPipeline
 
@@ -64,13 +65,18 @@ def run_evaluation(
     all_gold: list[list[str]] = []
     all_timings: list[dict[str, float]] = []
     per_query_results: list[dict] = []
+    judge_inputs: list[dict] = []
+
+    # Determine if generation should be enabled for LLM judge
+    gen_cfg = config.get("generation", {})
+    gen_enabled = gen_cfg.get("enabled", False)
 
     for i, example in enumerate(examples):
         logger.info(f"Eval [{i+1}/{len(examples)}]: {example.question[:80]}...")
 
         result = pipeline.run(
             query=example.question,
-            skip_generation=True,  # No need for generation during eval
+            skip_generation=not gen_enabled,
         )
 
         # Extract retrieved sources
@@ -82,11 +88,20 @@ def run_evaluation(
         all_gold.append(example.gold_sources)
         all_timings.append(result.timings)
 
+        # Collect inputs for LLM judge
+        if gen_enabled and result.answer:
+            judge_inputs.append({
+                "question": example.question,
+                "hits": result.hits,
+                "answer": result.answer,
+            })
+
         # Per-query detail
         per_query_results.append({
             "question": example.question,
             "gold_sources": example.gold_sources,
             "retrieved_sources": retrieved_sources[:10],
+            "answer": result.answer if gen_enabled else "(skipped)",
             "timings": result.timings,
         })
 
@@ -103,12 +118,21 @@ def run_evaluation(
     except Exception:
         index_stats = {}
 
+    # Run LLM-as-a-Judge
+    generation_metrics = {}
+    if gen_enabled and judge_inputs:
+        logger.info(f"Running LLM Judge on {len(judge_inputs)} answers...")
+        judge = LLMJudge(config.get("generation", {}))
+        generation_metrics = judge.evaluate_batch(judge_inputs)
+        logger.info(f"Judge scores: {generation_metrics}")
+
     # Build report
     report = {
         "config_file": str(eval_path),
         "num_queries": len(examples),
         "k_values": k_values,
         "retrieval_metrics": retrieval_metrics,
+        "generation_metrics": generation_metrics,
         "latency_summary": latency_summary,
         "index_stats": index_stats,
         "per_query_results": per_query_results,
@@ -132,6 +156,8 @@ def run_evaluation(
 def main():
     """Run evaluation from the command line."""
     import argparse
+    from dotenv import load_dotenv
+    load_dotenv()
 
     parser = argparse.ArgumentParser(
         description="Run RAG-OS evaluation harness"
@@ -179,6 +205,11 @@ def main():
     print("\n--- Retrieval Metrics ---")
     for key, value in report.get("retrieval_metrics", {}).items():
         print(f"  {key}: {value}")
+
+    if report.get("generation_metrics"):
+        print("\n--- Generation Quality (LLM Judge) ---")
+        for key, value in report["generation_metrics"].items():
+            print(f"  {key}: {value}/5")
 
     print("\n--- Latency Summary ---")
     for key, stats in report.get("latency_summary", {}).items():

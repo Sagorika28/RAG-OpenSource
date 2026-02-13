@@ -32,6 +32,7 @@ reranker:
 
 retrieval:
   top_k: 10                   # Number of candidates from vector search
+  dedup_threshold: 0.9        # Jaccard similarity threshold for dedup
 
 generation:
   enabled: true

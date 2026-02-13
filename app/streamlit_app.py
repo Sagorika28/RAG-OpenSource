@@ -29,6 +29,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.core.config import load_config
 from src.core.utils import setup_logging
 from src.pipeline.query import QueryPipeline
+from src.eval.run_eval import run_evaluation
 
 
 @st.cache_resource
@@ -106,6 +107,24 @@ with st.sidebar:
             st.json(stats)
         except Exception as e:
             st.error(f"Could not load index stats: {e}")
+
+    # Evaluation Dashboard
+    st.markdown("---")
+    st.subheader("🧪 Evaluation")
+    if st.button("▶️ Run Full Evaluation", type="primary"):
+        config_path = config_dir / selected_config
+        cfg = load_config(str(config_path))
+        with st.spinner("Running evaluation (retrieval + generation)..."):
+            try:
+                report = run_evaluation(
+                    config=cfg,
+                    k_values=[1, 3, 5],
+                )
+                st.session_state["eval_report"] = report
+                st.success("Evaluation complete!")
+            except Exception as e:
+                st.error(f"Evaluation failed: {e}")
+                st.exception(e)
 
 # --------------------------------------------------------------------- #
 #  Main area                                                             #
@@ -208,3 +227,79 @@ if query and selected_config:
 
 elif not selected_config:
     st.warning("No config files found. Please add a YAML config to `configs/`.")
+
+# --------------------------------------------------------------------- #
+#  Evaluation Dashboard (below query results)                            #
+# --------------------------------------------------------------------- #
+
+if "eval_report" in st.session_state:
+    report = st.session_state["eval_report"]
+
+    st.markdown("---")
+    st.header("🧪 Evaluation Dashboard")
+
+    # ---- Retrieval Metrics ----
+    st.subheader("📥 Retrieval Quality")
+    ret_metrics = report.get("retrieval_metrics", {})
+    if ret_metrics:
+        # Group by metric type
+        recall_cols = st.columns(3)
+        mrr_cols = st.columns(3)
+        ndcg_cols = st.columns(3)
+
+        for i, k in enumerate([1, 3, 5]):
+            with recall_cols[i]:
+                val = ret_metrics.get(f"recall@{k}", 0)
+                st.metric(f"Recall@{k}", f"{val:.2%}")
+            with mrr_cols[i]:
+                val = ret_metrics.get(f"mrr@{k}", 0)
+                st.metric(f"MRR@{k}", f"{val:.2%}")
+            with ndcg_cols[i]:
+                val = ret_metrics.get(f"ndcg@{k}", 0)
+                st.metric(f"nDCG@{k}", f"{val:.2%}")
+    else:
+        st.info("No retrieval metrics available.")
+
+    # ---- Generation Metrics (LLM Judge) ----
+    gen_metrics = report.get("generation_metrics", {})
+    if gen_metrics:
+        st.subheader("🤖 Generation Quality (LLM-as-a-Judge)")
+        judge_cols = st.columns(4)
+        labels = ["faithfulness", "relevance", "completeness", "overall"]
+        icons = ["🎯", "📌", "📊", "⭐"]
+        for i, (label, icon) in enumerate(zip(labels, icons)):
+            with judge_cols[i]:
+                val = gen_metrics.get(label, 0)
+                st.metric(
+                    f"{icon} {label.title()}",
+                    f"{val}/5",
+                )
+
+    # ---- Latency Summary ----
+    lat_summary = report.get("latency_summary", {})
+    if lat_summary:
+        st.subheader("⏱️ Latency")
+        lat_cols = st.columns(len(lat_summary))
+        for i, (key, stats) in enumerate(lat_summary.items()):
+            with lat_cols[i % len(lat_cols)]:
+                label = key.replace("_ms", "").title()
+                st.metric(f"{label} (p50)", f"{stats.get('p50', 0):.1f} ms")
+
+    # ---- Per-Query Breakdown ----
+    with st.expander("📋 Per-Query Breakdown"):
+        for i, pq in enumerate(report.get("per_query_results", []), 1):
+            st.markdown(f"**Q{i}:** {pq['question']}")
+            st.caption(f"Gold: {pq['gold_sources']} | Retrieved: {pq['retrieved_sources'][:5]}")
+            if pq.get("answer") and pq["answer"] != "(skipped)":
+                st.markdown(f"> {pq['answer'][:300]}..." if len(pq.get('answer','')) > 300 else f"> {pq.get('answer','')}")
+            st.markdown("---")
+
+    # ---- Download Report ----
+    import json as _json
+    report_json = _json.dumps(report, indent=2, default=str)
+    st.download_button(
+        "📥 Download Full Report (JSON)",
+        data=report_json,
+        file_name="eval_report.json",
+        mime="application/json",
+    )

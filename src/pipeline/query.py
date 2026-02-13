@@ -129,6 +129,18 @@ class QueryPipeline:
         with timer("rerank", timings):
             hits = reranker.rerank(query, hits)
 
+        # 3.5 Deduplicate near-identical chunks
+        dedup_threshold = self.config.get("retrieval", {}).get(
+            "dedup_threshold", 0.9
+        )
+        if dedup_threshold < 1.0:
+            pre_dedup = len(hits)
+            hits = self._deduplicate_hits(hits, dedup_threshold)
+            if len(hits) < pre_dedup:
+                logger.info(
+                    f"Dedup removed {pre_dedup - len(hits)} near-duplicate chunks"
+                )
+
         # 4. Generate answer (optional)
         answer = ""
         if not skip_generation:
@@ -146,6 +158,42 @@ class QueryPipeline:
             citations=citations,
             timings=timings,
         )
+
+    @staticmethod
+    def _deduplicate_hits(
+        hits: List[Hit], threshold: float = 0.9
+    ) -> List[Hit]:
+        """
+        Remove near-duplicate chunks using Jaccard word-set similarity.
+
+        Keeps the first (highest-scored) chunk and drops later chunks
+        whose word overlap with any already-kept chunk exceeds `threshold`.
+        """
+        if not hits:
+            return hits
+
+        def _word_set(text: str) -> set:
+            return set(text.lower().split())
+
+        def _jaccard(a: set, b: set) -> float:
+            if not a or not b:
+                return 0.0
+            return len(a & b) / len(a | b)
+
+        kept: List[Hit] = []
+        kept_words: List[set] = []
+
+        for hit in hits:
+            text = hit.chunk.raw_text or hit.chunk.text
+            words = _word_set(text)
+            is_dup = any(
+                _jaccard(words, kw) >= threshold for kw in kept_words
+            )
+            if not is_dup:
+                kept.append(hit)
+                kept_words.append(words)
+
+        return kept
 
     @staticmethod
     def _build_citations(hits: List[Hit]) -> List[Dict[str, Any]]:

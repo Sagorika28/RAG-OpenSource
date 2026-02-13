@@ -10,7 +10,10 @@ Production-ready fully open-source, self-hostable Retrieval-Augmented Generation
 - **Adaptive chunking**: Section-aware, block, page-level strategies based on document type
 - **Qdrant vector store**: Local embedded mode (no Docker) or server mode
 - **Retrieval + optional reranking + optional LLM generation**
-- **Evaluation harness**: Recall@k, MRR@k, nDCG@k with latency profiling
+- **LLM-as-a-Judge**: Automated answer quality scoring (Faithfulness, Relevance, Completeness)
+- **Retrieval deduplication**: Filters near-duplicate chunks for diverse Top-K results
+- **Evaluation harness**: Recall@k, MRR@k, nDCG@k + generation quality metrics
+- **Evaluation Dashboard**: In-app Streamlit dashboard with metrics, per-query breakdown, JSON export
 - **Streamlit demo UI**: Question → evidence → answer with citations
 - **CPU-first**: Runs on MacBook Air (Apple Silicon) without GPU
 
