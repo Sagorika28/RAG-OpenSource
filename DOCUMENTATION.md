@@ -14,17 +14,17 @@ graph LR
     Embed --> VectorDB[(Qdrant Local)]
     
     User[User Query] --> Embed
-    VectorDB --> Retrieve[Retrieval (Top-K)]
-    Retrieve --> Rerank[Cross-Encoder Reranker]
+    VectorDB --> Retr["Retrieval (Top-K)"]
+    Retr --> Rerank[Cross-Encoder Reranker]
     Rerank --> Context[Context Construction]
-    Context --> LLM[Groq / Ollama LLM]
+    Context --> LLM["Groq / Ollama LLM"]
     LLM --> Answer[Cited Answer]
 ```
 
 ## 2. Key Components
 
 ### 2.1 Parsing (Docling)
-We utilize **Docling** (by IBM) for advanced PDF parsing. Unlike simple text extractors (pypdf), Docling preserves document structure:
+I utilized **Docling** (by IBM) for advanced PDF parsing. Unlike simple text extractors (pypdf), Docling preserves document structure:
 - **Headings & Sections**: Used for hierarchy-aware chunking.
 - **Tables**: Extracted as markdown tables to preserve row/column relationships.
 - **Figures**: (Future) CAPTURED but currently text-only processing.
