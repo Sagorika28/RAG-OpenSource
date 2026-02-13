@@ -1,0 +1,51 @@
+# configs/gpu.yaml — GPU-accelerated configuration (production / scaling)
+
+parsing:
+  primary: docling
+  fallback_enabled: true
+  fallback: pymupdf
+
+chunking:
+  max_chunk_size: 512
+  min_chunk_size: 100
+  overlap: 50
+  context_header: true
+
+embeddings:
+  model_name: BAAI/bge-m3
+  dimension: 1024
+  batch_size: 64
+  device: cuda
+  query_prefix: ""            # BGE-M3 does not require a query prefix
+
+qdrant:
+  mode: server                # Production: connect to Qdrant Docker container
+  path: ./qdrant_data
+  url: http://localhost:6333
+  collection_name: rag_os_chunks
+
+reranker:
+  enabled: true               # Enable reranking on GPU
+  model_name: BAAI/bge-reranker-large
+  top_k: 10
+  device: cuda
+
+retrieval:
+  top_k: 20
+
+generation:
+  enabled: true
+  provider: ollama
+  model: qwen2.5:3b
+  base_url: http://localhost:11434
+  temperature: 0.1
+  max_tokens: 1024
+  system_prompt: |
+    You are a helpful technical assistant. Answer the question using ONLY
+    the provided context. Cite sources using [Source: filename, Page: N].
+    If the context does not contain enough information, say so.
+
+data:
+  pdf_dir: ./data/pdfs
+  eval_file: ./data/eval/questions.jsonl
+  output_dir: ./outputs

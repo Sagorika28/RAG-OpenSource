@@ -1,0 +1,29 @@
+# RAG-OS: CPU-first dependencies (Apple Silicon compatible)
+# Install: pip install -r requirements.txt
+
+# --- Parsing ---
+docling>=2.14.0
+PyMuPDF>=1.25.0           # AGPL — optional fallback parser
+
+# --- Embeddings & Reranking ---
+sentence-transformers>=3.3.0
+torch>=2.2.0              # CPU-only; pip installs CPU wheel by default on macOS
+transformers>=4.40.0
+
+# --- Vector store ---
+qdrant-client>=1.12.0
+
+# --- LLM client (Ollama HTTP) ---
+requests>=2.31.0
+
+# --- Config ---
+PyYAML>=6.0
+
+# --- Evaluation ---
+numpy>=1.26.0
+
+# --- UI ---
+streamlit>=1.40.0
+
+# --- Utilities ---
+tqdm>=4.66.0
