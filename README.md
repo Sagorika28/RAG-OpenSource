@@ -1,6 +1,6 @@
 # RAG-OS — Modular RAG Pipeline
 
-A production-minded, fully open-source, self-hostable Retrieval-Augmented Generation (RAG) pipeline. Designed for ingesting technical PDFs (manuals, standards, newsletters, booklets, flyers, slides) and answering questions with cited evidence.
+Production-ready fully open-source, self-hostable Retrieval-Augmented Generation (RAG) pipeline. Designed for ingesting technical PDFs (manuals, standards, newsletters, booklets, flyers, slides) and answering questions with cited evidence.
 
 ## Features
 
