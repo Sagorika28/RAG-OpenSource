@@ -30,7 +30,7 @@ reranker:
   device: cpu
 
 retrieval:
-  top_k: 20                              # Candidates for reranker (was 10)
+  top_k: 40                              # Wider net for the reranker (was 20)
   top_p: 0.9
   dedup_threshold: 0.9             # Jaccard similarity threshold (0.9 = 90% word overlap → duplicate)
   query_rewrite: true              # LLM expands vague queries before search
