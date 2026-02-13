@@ -1,5 +1,7 @@
 # RAG-OS — Modular RAG Pipeline
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://rag-opensource.streamlit.app/)
+
 Production-ready fully open-source, self-hostable Retrieval-Augmented Generation (RAG) pipeline. Designed for ingesting technical PDFs (manuals, standards, newsletters, booklets, flyers, slides) and answering questions with cited evidence.
 
 ## Features
