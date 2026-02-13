@@ -25,7 +25,7 @@ qdrant:
 
 reranker:
   enabled: true
-  model_name: BAAI/bge-reranker-v2-m3   # Upgraded from base for better intent matching
+  model_name: BAAI/bge-reranker-base    # Smaller model for Streamlit Cloud (1GB RAM limit)
   top_k: 10                              # Chunks passed to LLM (was 5)
   device: cpu
 

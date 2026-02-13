@@ -26,7 +26,7 @@ qdrant:
 
 reranker:
   enabled: false              # Toggle off for speed on CPU
-  model_name: BAAI/bge-reranker-v2-m3   # Upgraded for better intent matching
+  model_name: BAAI/bge-reranker-base    # Smaller model for cloud deployment
   top_k: 10                    # Chunks passed to LLM (was 5)
   device: cpu
 
