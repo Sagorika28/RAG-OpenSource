@@ -114,11 +114,13 @@ with st.sidebar:
     if st.button("▶️ Run Full Evaluation", type="primary"):
         config_path = config_dir / selected_config
         cfg = load_config(str(config_path))
+        pipe = get_pipeline(str(config_path))
         with st.spinner("Running evaluation (retrieval + generation)..."):
             try:
                 report = run_evaluation(
                     config=cfg,
                     k_values=[1, 3, 5],
+                    pipeline=pipe,
                 )
                 st.session_state["eval_report"] = report
                 st.success("Evaluation complete!")

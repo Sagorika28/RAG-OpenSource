@@ -32,6 +32,7 @@ def run_evaluation(
     eval_path: str | Path | None = None,
     output_path: str | Path | None = None,
     k_values: list[int] | None = None,
+    pipeline: "QueryPipeline | None" = None,
 ) -> Dict[str, Any]:
     """
     Run the full evaluation.
@@ -41,6 +42,7 @@ def run_evaluation(
         eval_path:   Path to questions.jsonl (falls back to config).
         output_path: Where to write the JSON report (optional).
         k_values:    k values for retrieval metrics.
+        pipeline:    Optional existing QueryPipeline to reuse (avoids Qdrant lock conflicts).
 
     Returns:
         Evaluation report as a dict.
@@ -57,8 +59,9 @@ def run_evaluation(
         logger.error("No evaluation examples loaded — aborting")
         return {"error": "empty dataset"}
 
-    # Initialize query pipeline
-    pipeline = QueryPipeline(config)
+    # Initialize query pipeline (reuse if provided)
+    if pipeline is None:
+        pipeline = QueryPipeline(config)
 
     # Run each example
     all_retrieved: list[list[str]] = []
