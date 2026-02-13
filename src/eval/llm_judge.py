@@ -140,7 +140,7 @@ class LLMJudge:
     def evaluate_batch(
         self,
         results: List[Dict[str, Any]],
-        max_workers: int = 4,
+        max_workers: int = 2,
     ) -> Dict[str, float]:
         """
         Evaluate a batch of results and return averaged scores.

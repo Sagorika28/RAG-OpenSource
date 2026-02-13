@@ -108,7 +108,7 @@ def run_evaluation(
         }
 
     # Run in parallel
-    max_workers = 4  # Balanced for CPU-bound reranker + IO-bound LLM
+    max_workers = 2  # Streamlit Cloud has limited CPUs; 2 is safer for CPU-bound reranker
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [
             executor.submit(_process_example, i, ex)
