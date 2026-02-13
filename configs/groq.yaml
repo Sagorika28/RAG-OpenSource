@@ -15,7 +15,7 @@ embeddings:
   model_name: "BAAI/bge-small-en-v1.5"
   dimension: 384
   batch_size: 32
-  device: mps  # Use MPS locally on Mac
+  device: cpu  # Must be CPU for Streamlit Cloud (No MPS/CUDA)
   query_prefix: "Represent this sentence for searching relevant passages: "
 
 qdrant:
@@ -26,7 +26,7 @@ qdrant:
 reranker:
   enabled: true
   model_name: BAAI/bge-reranker-base
-  device: mps
+  device: cpu
 
 retrieval:
   top_k: 10
