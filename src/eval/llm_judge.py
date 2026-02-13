@@ -123,16 +123,19 @@ class LLMJudge:
 
             except Exception as e:
                 # Handle rate limits (429) with retry
-                if "429" in str(e) and attempt < max_retries - 1:
-                    logger.warning(f"Judge Rate Limit hit (429). Retrying in {retry_delay}s...")
-                    time.sleep(retry_delay)
-                    retry_delay *= 2
-                    continue
+                if "429" in str(e):
+                    if attempt < max_retries - 1:
+                        logger.warning(f"Judge Rate Limit hit (429). Retrying in {retry_delay}s...")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2
+                        continue
+                    else:
+                        return self._empty_scores(justification="⚠️ Rate limit reached")
                 
                 logger.error(f"LLM Judge failed: {e}")
-                return self._empty_scores()
+                return self._empty_scores(justification=f"❌ Error: {str(e)[:50]}")
         
-        return self._empty_scores()
+        return self._empty_scores(justification="⚠️ Request timed out")
 
     def evaluate_batch(
         self,
@@ -213,13 +216,13 @@ class LLMJudge:
             return LLMJudge._empty_scores()
 
     @staticmethod
-    def _empty_scores() -> Dict[str, Any]:
+    def _empty_scores(justification: str = "evaluation skipped") -> Dict[str, Any]:
         return {
             "faithfulness": 0,
             "relevance": 0,
             "completeness": 0,
             "overall": 0.0,
-            "justification": "evaluation skipped",
+            "justification": justification,
         }
 
     @staticmethod

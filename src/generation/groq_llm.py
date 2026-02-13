@@ -70,16 +70,22 @@ class GroqGenerator(BaseGenerator):
 
             except Exception as e:
                 # Handle rate limits (429) with retry
-                if "429" in str(e) and attempt < max_retries - 1:
-                    logger.warning(f"Groq Rate Limit hit (429). Retrying in {retry_delay}s... (Attempt {attempt+1}/{max_retries})")
-                    time.sleep(retry_delay)
-                    retry_delay *= 2  # Exponential backoff
-                    continue
+                if "429" in str(e):
+                    if attempt < max_retries - 1:
+                        logger.warning(f"Groq Rate Limit hit (429). Retrying in {retry_delay}s... (Attempt {attempt+1}/{max_retries})")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2  # Exponential backoff
+                        continue
+                    else:
+                        return (
+                            "⚠️ **Groq Rate Limit Reached.** You've hit the daily token limit for your account "
+                            "(likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config."
+                        )
                 
                 logger.error(f"Groq generation failed: {e}")
-                return f"Error generating answer: {e}"
+                return "❌ **AI Generation Error.** The AI provider (Groq) encountered an issue. Please check your API key and connection."
         
-        return "Error: Maximum retries exceeded for Groq generation."
+        return "⚠️ **Request Timed Out.** The AI didn't respond after several retries. This usually happens during high-traffic periods."
 
     def _build_context(self, hits: List[Hit]) -> str:
         """Format retrieved chunks as numbered context for the prompt."""

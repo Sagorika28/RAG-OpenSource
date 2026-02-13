@@ -11,9 +11,10 @@ Production-ready fully open-source, self-hostable Retrieval-Augmented Generation
 - **Qdrant vector store**: Local embedded mode (no Docker) or server mode
 - **Retrieval + optional reranking + optional LLM generation**
 - **LLM-as-a-Judge**: Automated answer quality scoring (Faithfulness, Relevance, Completeness)
-- **Retrieval deduplication**: Filters near-duplicate chunks for diverse Top-K results
-- **Evaluation harness**: Recall@k, MRR@k, nDCG@k + generation quality metrics
-- **Evaluation Dashboard**: In-app Streamlit dashboard with metrics, per-query breakdown, JSON export
+- **Evaluation harness**: Parallelized Recall@k, MRR@k, nDCG@k computation with exponential backoff on Groq
+- **Query Rewriting**: LLM expands vague technician queries into rich, specific technical search terms
+- **Synthetic Data Generation**: LLM-powered script to generate robust evaluation datasets from your own PDFs
+- **Evaluation Dashboard**: In-app Streamlit dashboard with robust metrics and per-query breakdown
 - **Streamlit demo UI**: Question → evidence → answer with citations
 - **CPU-first**: Runs on MacBook Air (Apple Silicon) without GPU
 
@@ -73,8 +74,8 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
 First, edit `data/eval/questions.jsonl` to match your actual PDF filenames and questions:
 
 ```bash
-# Run eval and generate report
-python -m src.eval.run_eval --config configs/cpu.yaml --output outputs/eval_report.json
+# Run eval using the robust synthetic dataset (preferred)
+python -m src.eval.run_eval --config configs/groq.yaml --k 1 3 5 --output outputs/eval_report.json
 
 # Compare configs
 python -m src.eval.run_eval --config configs/gpu.yaml --output outputs/eval_report_gpu.json
@@ -178,8 +179,17 @@ To run locally with Groq (instead of Ollama):
 2.  Run with Groq config:
     ```bash
     streamlit run app/streamlit_app.py
-    # Select 'groq.yaml' in the sidebar
-    ```
+### Generating a Robust Evaluation Set
+To generate a larger, statistically significant evaluation dataset from your documents:
+```bash
+export PYTHONPATH=$PYTHONPATH:.
+python src/scripts/generate_synthetic_eval.py --num 25 --output data/eval/questions_robust.jsonl
+```
+
+## Performance & Scaling
+- **Parallel Execution**: Evaluations are parallelized (4 concurrent workers) to handle 20+ queries in ~1.5 mins.
+- **Resilience**: Integrated exponential backoff for Groq API calls to handle rate limits (429) automatically.
+- **Token Efficiency**: Defaults to `llama-3.1-8b-instant` for evaluations to maximize token quota and speed.
 
 ## Evaluation
 

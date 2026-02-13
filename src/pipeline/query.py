@@ -146,11 +146,15 @@ class QueryPipeline:
                     return query
                 return rewritten
             except Exception as e:
-                if "429" in str(e) and attempt < max_retries - 1:
-                    logger.warning(f"Query rewriter Rate Limit hit. Retrying in {retry_delay}s...")
-                    time.sleep(retry_delay)
-                    retry_delay *= 2
-                    continue
+                if "429" in str(e):
+                    if attempt < max_retries - 1:
+                        logger.warning(f"Query rewriter Rate Limit hit. Retrying in {retry_delay}s...")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2
+                        continue
+                    else:
+                        logger.warning("Query rewriter hit max retries for 429. Using original query.")
+                        return query
                 logger.warning(f"Query rewrite failed, using original: {e}")
                 return query
 
