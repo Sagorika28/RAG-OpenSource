@@ -53,7 +53,7 @@ The system supports a hybrid inference model:
 
 The application is designed to run in two environments using a configuration-driven approach (`groq.yaml` vs `cpu.yaml`):
 
-| Feature | Local (MacBook Air) | Cloud (Streamlit Community) |
+| Feature | Local (MacBook) | Cloud (Streamlit Community) |
 |---------|---------------------|-----------------------------|
 | **Compute** | Apple Silicon (MPS/Metal) | Linux CPU (Shared) |
 | **Embeddings**| Hardware Accelerated (MPS) | CPU Optimized |
