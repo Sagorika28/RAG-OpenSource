@@ -8,6 +8,7 @@ Orchestrates: embed query → search Qdrant → (optional) rerank →
 from __future__ import annotations
 
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 from src.core.config import get_section
@@ -79,6 +80,54 @@ class QueryPipeline:
         return self._generator
 
     # ------------------------------------------------------------------ #
+    #  Query rewriting                                                     #
+    # ------------------------------------------------------------------ #
+
+    REWRITE_PROMPT = (
+        "You are a query expansion engine for a technical HVAC/refrigerant knowledge base. "
+        "A field technician has typed a short, vague query. Your job is to rewrite it into "
+        "a richer search query that will retrieve the most relevant technical procedures, "
+        "safety guidelines, and specifications.\n\n"
+        "Rules:\n"
+        "- Keep the original intent.\n"
+        "- Add related technical terms: procedures, tools, refrigerant types, safety steps.\n"
+        "- Output ONLY the rewritten query (one paragraph, no explanation).\n"
+        "- Do NOT answer the question, just expand the search terms.\n"
+    )
+
+    def _rewrite_query(self, query: str) -> str:
+        """
+        Use LLM to expand a vague user query into a richer search query.
+
+        Uses the fast 8B model for speed (~200ms via Groq).
+        Falls back to original query on any error.
+        """
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            return query
+
+        try:
+            from groq import Groq
+            client = Groq(api_key=api_key)
+            resp = client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": self.REWRITE_PROMPT},
+                    {"role": "user", "content": f"Technician query: {query}"},
+                ],
+                model="llama-3.1-8b-instant",  # Fast model for rewriting
+                temperature=0.0,
+                max_tokens=150,
+            )
+            rewritten = resp.choices[0].message.content.strip()
+            # Sanity check: if rewrite is too long or empty, use original
+            if not rewritten or len(rewritten) > 500:
+                return query
+            return rewritten
+        except Exception as e:
+            logger.warning(f"Query rewrite failed, using original: {e}")
+            return query
+
+    # ------------------------------------------------------------------ #
     #  Public API                                                         #
     # ------------------------------------------------------------------ #
 
@@ -106,13 +155,21 @@ class QueryPipeline:
         timings: Dict[str, float] = {}
         retrieval_k = top_k or self.config.get("retrieval", {}).get("top_k", 10)
 
-        # 1. Embed query
+        # 0. Query rewriting (expand vague queries for better retrieval)
+        search_query = query
+        if self.config.get("retrieval", {}).get("query_rewrite", False):
+            with timer("rewrite", timings):
+                search_query = self._rewrite_query(query)
+                if search_query != query:
+                    logger.info(f"Query rewritten: '{query}' → '{search_query}'")
+
+        # 1. Embed query (use rewritten version for search)
         embedder = self._get_embedder()
         with timer("embed", timings):
             if hasattr(embedder, "embed_query"):
-                query_vector = embedder.embed_query(query)
+                query_vector = embedder.embed_query(search_query)
             else:
-                query_vector = embedder.embed([query])
+                query_vector = embedder.embed([search_query])
 
         # 2. Search Qdrant
         store = self._get_store()
@@ -124,10 +181,10 @@ class QueryPipeline:
                 source=source,
             )
 
-        # 3. Rerank (optional)
+        # 3. Rerank (optional) — use rewritten query for better ranking
         reranker = self._get_reranker()
         with timer("rerank", timings):
-            hits = reranker.rerank(query, hits)
+            hits = reranker.rerank(search_query, hits)
 
         # 3.5 Deduplicate near-identical chunks
         dedup_threshold = self.config.get("retrieval", {}).get(

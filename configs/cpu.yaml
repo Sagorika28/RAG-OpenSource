@@ -26,13 +26,14 @@ qdrant:
 
 reranker:
   enabled: false              # Toggle off for speed on CPU
-  model_name: BAAI/bge-reranker-base
+  model_name: BAAI/bge-reranker-v2-m3   # Upgraded for better intent matching
   top_k: 5                    # Re-rank top N hits
   device: cpu
 
 retrieval:
   top_k: 10                   # Number of candidates from vector search
   dedup_threshold: 0.9        # Jaccard similarity threshold for dedup
+  query_rewrite: true         # LLM expands vague queries before search
 
 generation:
   enabled: true
@@ -59,6 +60,7 @@ generation:
     10. Do NOT write filenames or any text inside the brackets.
     11. Limit your response to a maximum of 8–9 sentences.
     12. Do not provide casual conversation or unnecessary filler.
+    13. PRIORITIZE technical procedures, hands-on steps, safety measures, and specifications over administrative content (procurement policies, contracts, portal descriptions). If both types are present in the sources, focus your answer on the technical/procedural content.
 
     When relevant:
     - Mention refrigerant type (e.g., hydrocarbon, HFC, etc.)
