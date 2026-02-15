@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import requests
 
@@ -40,7 +40,12 @@ class OllamaGenerator(BaseGenerator):
             ),
         )
 
-    def generate(self, query: str, hits: List[Hit]) -> str:
+    def generate(
+        self,
+        query: str,
+        hits: List[Hit],
+        conversation_history: Optional[List[Dict[str, Any]]] = None,
+    ) -> str:
         """
         Generate an answer with citations from retrieved chunks.
 
@@ -57,9 +62,12 @@ class OllamaGenerator(BaseGenerator):
         # Build context block from hits
         context = self._build_context(hits)
 
+        history = self._build_history(conversation_history)
+
         # Construct the full prompt
         prompt = (
             f"{self.system_prompt}\n\n"
+            f"### Conversation History\n{history}\n\n"
             f"### Context\n{context}\n\n"
             f"### Question\n{query}\n\n"
             f"### Answer"
@@ -91,6 +99,30 @@ class OllamaGenerator(BaseGenerator):
             context_parts.append(f"{header}\n{text}")
 
         return "\n\n---\n\n".join(context_parts)
+
+    @staticmethod
+    def _build_history(
+        conversation_history: Optional[List[Dict[str, Any]]]
+    ) -> str:
+        """
+        Format recent conversation turns for conversational continuity.
+        Keeps only the latest 6 turns to control prompt length.
+        """
+        if not conversation_history:
+            return "(none)"
+
+        recent = conversation_history[-6:]
+        lines: list[str] = []
+        for turn in recent:
+            role = str(turn.get("role", "")).lower()
+            if role not in {"user", "assistant"}:
+                continue
+            content = str(turn.get("content", "")).strip()
+            if not content:
+                continue
+            prefix = "User" if role == "user" else "Assistant"
+            lines.append(f"{prefix}: {content}")
+        return "\n".join(lines) if lines else "(none)"
 
     def _call_ollama(self, prompt: str) -> str:
         """

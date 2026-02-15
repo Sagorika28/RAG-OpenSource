@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from groq import Groq
 
@@ -35,7 +35,12 @@ class GroqGenerator(BaseGenerator):
         self.max_tokens = config.get("max_tokens", 1024)
         self.system_prompt = config.get("system_prompt", "You are a helpful assistant.")
 
-    def generate(self, query: str, context_hits: List[Hit]) -> str:
+    def generate(
+        self,
+        query: str,
+        context_hits: List[Hit],
+        conversation_history: Optional[List[Dict[str, Any]]] = None,
+    ) -> str:
         """
         Generate answer using Groq API.
         """
@@ -43,6 +48,7 @@ class GroqGenerator(BaseGenerator):
             return "Error: GROQ_API_KEY not set. Please add it to your environment."
 
         context_str = self._build_context(context_hits)
+        history_str = self._build_history(conversation_history)
         
         max_retries = 3
         retry_delay = 2.0
@@ -55,11 +61,15 @@ class GroqGenerator(BaseGenerator):
                             "role": "system",
                             "content": self.system_prompt,
                         },
-                        {
-                            "role": "user",
-                            "content": f"Context:\n{context_str}\n\nQuestion: {query}",
-                        },
-                    ],
+                    {
+                        "role": "user",
+                        "content": (
+                            f"Conversation History:\n{history_str}\n\n"
+                            f"Context:\n{context_str}\n\n"
+                            f"Question: {query}"
+                        ),
+                    },
+                ],
                     model=self.model,
                     temperature=self.temperature,
                     max_tokens=self.max_tokens,
@@ -106,3 +116,24 @@ class GroqGenerator(BaseGenerator):
             context_parts.append(f"{header}\n{text}")
 
         return "\n\n---\n\n".join(context_parts)
+
+    @staticmethod
+    def _build_history(
+        conversation_history: Optional[List[Dict[str, Any]]]
+    ) -> str:
+        """Format recent user/assistant turns for chat continuity."""
+        if not conversation_history:
+            return "(none)"
+
+        recent = conversation_history[-6:]
+        lines: list[str] = []
+        for turn in recent:
+            role = str(turn.get("role", "")).lower()
+            if role not in {"user", "assistant"}:
+                continue
+            content = str(turn.get("content", "")).strip()
+            if not content:
+                continue
+            prefix = "User" if role == "user" else "Assistant"
+            lines.append(f"{prefix}: {content}")
+        return "\n".join(lines) if lines else "(none)"

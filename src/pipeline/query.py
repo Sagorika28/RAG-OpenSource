@@ -300,7 +300,11 @@ class QueryPipeline:
         if not skip_generation:
             generator = self._get_generator()
             with timer("generate", timings):
-                answer = generator.generate(query, hits)
+                answer = generator.generate(
+                    query,
+                    hits,
+                    conversation_history=conversation_history,
+                )
 
         # 5. Build citations
         citations = self._build_citations(hits)
