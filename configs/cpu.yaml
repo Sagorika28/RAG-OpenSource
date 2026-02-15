@@ -15,7 +15,7 @@ embeddings:
   model_name: BAAI/bge-small-en-v1.5
   dimension: 384
   batch_size: 32
-  device: mps
+  device: auto
   query_prefix: "Represent this sentence for searching relevant passages: "
 
 qdrant:
@@ -28,7 +28,7 @@ reranker:
   enabled: false              # Toggle off for speed on CPU
   model_name: BAAI/bge-reranker-base    # Smaller model for cloud deployment
   top_k: 10                    # Chunks passed to LLM (was 5)
-  device: cpu
+  device: auto
 
 retrieval:
   top_k: 40                   # Wider net for the reranker (was 20)

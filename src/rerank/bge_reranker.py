@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List
 
+from src.core.device import resolve_torch_device
 from src.core.types import Hit
 from src.rerank.base import BaseReranker
 
@@ -26,7 +27,10 @@ class BGEReranker(BaseReranker):
         self._model_name = self.config.get(
             "model_name", "BAAI/bge-reranker-base"
         )
-        self._device = self.config.get("device", "cpu")
+        self._device = resolve_torch_device(
+            self.config.get("device", "auto"),
+            component="reranker",
+        )
         self._top_k = self.config.get("top_k", 5)
 
     def _load_model(self):
