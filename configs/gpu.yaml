@@ -4,6 +4,7 @@ parsing:
   primary: docling
   fallback_enabled: true
   fallback: pymupdf
+  selective_ocr_enabled: false  # OCRmyPDF only on pages flagged by selective heuristic
 
 chunking:
   max_chunk_size: 512
