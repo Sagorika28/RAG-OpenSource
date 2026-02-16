@@ -35,6 +35,7 @@ def run_evaluation(
     output_path: str | Path | None = None,
     k_values: list[int] | None = None,
     pipeline: "QueryPipeline | None" = None,
+    max_workers: int | None = None,
 ) -> Dict[str, Any]:
     """
     Run the full evaluation.
@@ -45,6 +46,8 @@ def run_evaluation(
         output_path: Where to write the JSON report (optional).
         k_values:    k values for retrieval metrics.
         pipeline:    Optional existing QueryPipeline to reuse (avoids Qdrant lock conflicts).
+        max_workers: Number of worker threads. Defaults to config["eval"]["max_workers"]
+                     or 1 for safe single-thread execution.
 
     Returns:
         Evaluation report as a dict.
@@ -107,20 +110,16 @@ def run_evaluation(
             "hits": result.hits,
         }
 
-    # Run in parallel
-    max_workers = 2  # Streamlit Cloud has limited CPUs; 2 is safer for CPU-bound reranker
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [
-            executor.submit(_process_example, i, ex)
-            for i, ex in enumerate(examples)
-        ]
-        
-        for future in futures:
+    if max_workers is None:
+        max_workers = int(config.get("eval", {}).get("max_workers", 1))
+    max_workers = max(1, int(max_workers))
+
+    if max_workers == 1:
+        logger.info("Running evaluation in single-thread mode")
+        for i, ex in enumerate(examples):
             try:
-                res = future.result()
+                res = _process_example(i, ex)
                 idx = res["idx"]
-                
-                # Collect results in order
                 per_query_results[idx] = {
                     "question": res["question"],
                     "gold_sources": res["gold_sources"],
@@ -128,18 +127,46 @@ def run_evaluation(
                     "answer": res["answer"] if gen_enabled else "(skipped)",
                     "timings": res["timings"],
                 }
-                
-                # Aggregate for metrics
-                # We'll re-extract lists to maintain order
                 if gen_enabled and res["answer"]:
                     judge_inputs.append({
                         "question": res["question"],
                         "hits": res["hits"],
                         "answer": res["answer"],
-                        "idx": idx  # Store index to sort later if needed
+                        "idx": idx,
                     })
             except Exception as e:
-                logger.error(f"Parallel eval failed for an example: {e}")
+                logger.error(f"Eval failed for example {i+1}: {e}")
+    else:
+        logger.info(f"Running evaluation in parallel mode (workers={max_workers})")
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [
+                executor.submit(_process_example, i, ex)
+                for i, ex in enumerate(examples)
+            ]
+
+            for future in futures:
+                try:
+                    res = future.result()
+                    idx = res["idx"]
+
+                    # Collect results in order
+                    per_query_results[idx] = {
+                        "question": res["question"],
+                        "gold_sources": res["gold_sources"],
+                        "retrieved_sources": res["retrieved_sources"][:10],
+                        "answer": res["answer"] if gen_enabled else "(skipped)",
+                        "timings": res["timings"],
+                    }
+
+                    if gen_enabled and res["answer"]:
+                        judge_inputs.append({
+                            "question": res["question"],
+                            "hits": res["hits"],
+                            "answer": res["answer"],
+                            "idx": idx,
+                        })
+                except Exception as e:
+                    logger.error(f"Parallel eval failed for an example: {e}")
 
     # Re-sort judge_inputs to maintain original order for report consistency
     judge_inputs.sort(key=lambda x: x["idx"])
@@ -228,6 +255,12 @@ def main():
         default=[1, 3, 5, 10],
         help="k values for retrieval metrics",
     )
+    parser.add_argument(
+        "--workers", "-w",
+        type=int,
+        default=None,
+        help="Number of eval workers (default: config.eval.max_workers or 1)",
+    )
     args = parser.parse_args()
 
     setup_logging()
@@ -238,6 +271,7 @@ def main():
         eval_path=args.eval_file,
         output_path=args.output,
         k_values=args.k,
+        max_workers=args.workers,
     )
 
     # Print summary
