@@ -4,6 +4,7 @@
 # --- Parsing ---
 docling>=2.14.0
 PyMuPDF>=1.25.0           # AGPL — optional fallback parser
+ocrmypdf>=16.6.0          # Selective OCR (requires system tools like tesseract/pngquant)
 
 # --- Embeddings & Reranking ---
 sentence-transformers>=3.3.0

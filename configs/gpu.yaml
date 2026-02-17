@@ -4,6 +4,7 @@ parsing:
   primary: docling
   fallback_enabled: true
   fallback: pymupdf
+  selective_ocr_enabled: false  # OCRmyPDF only on pages flagged by selective heuristic
 
 chunking:
   max_chunk_size: 512
@@ -15,7 +16,7 @@ embeddings:
   model_name: BAAI/bge-m3
   dimension: 1024
   batch_size: 64
-  device: cuda
+  device: auto
   query_prefix: ""            # BGE-M3 does not require a query prefix
 
 qdrant:
@@ -28,7 +29,7 @@ reranker:
   enabled: true               # Enable reranking on GPU
   model_name: BAAI/bge-reranker-large
   top_k: 10
-  device: cuda
+  device: auto
 
 retrieval:
   top_k: 20

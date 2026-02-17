@@ -8,6 +8,9 @@ Orchestrates: embed query → search Qdrant → (optional) rerank →
 from __future__ import annotations
 
 import logging
+import os
+import re
+import time
 from typing import Any, Dict, List, Optional
 
 from src.core.config import get_section
@@ -79,6 +82,143 @@ class QueryPipeline:
         return self._generator
 
     # ------------------------------------------------------------------ #
+    #  Query rewriting                                                     #
+    # ------------------------------------------------------------------ #
+
+    REWRITE_PROMPT = (
+        "You are a search query optimizer for a technical HVAC and refrigerant knowledge base. "
+        "A technician has typed a short, vague query. Your job is to expand it into a set of "
+        "technical search terms that help find the most relevant manual sections or procedures.\n\n"
+        "Rules:\n"
+        "- Keep the original intent.\n"
+        "- Add 3-5 relevant technical categories or concepts (e.g., 'leak detection', 'safety standards', 'servicing procedures').\n"
+        "- Do NOT provide an exhaustive list of every possible refrigerant or tool.\n"
+        "- Output ONLY the expanded query string.\n"
+    )
+
+    _INTENT_WORDS = {
+        "how",
+        "what",
+        "why",
+        "steps",
+        "procedure",
+        "limit",
+        "maximum",
+        "minimum",
+        "define",
+        "meaning",
+        "error",
+        "fix",
+        "troubleshoot",
+    }
+
+    @staticmethod
+    def _tokenize(text: str) -> List[str]:
+        return re.findall(r"[A-Za-z0-9_]+", text.lower())
+
+    def _is_short_query(self, query: str) -> bool:
+        """A query is short if it has <= 3 tokens."""
+        return len(self._tokenize(query)) <= 3
+
+    def _has_intent_words(self, query: str) -> bool:
+        """Intent exists if query contains any configured intent words."""
+        tokens = set(self._tokenize(query))
+        return any(word in tokens for word in self._INTENT_WORDS)
+
+    @staticmethod
+    def _has_conversation_history(
+        conversation_history: Optional[List[Dict[str, Any]]]
+    ) -> bool:
+        """History exists if at least one prior user/assistant turn is present."""
+        if not conversation_history:
+            return False
+        return any(
+            str(turn.get("role", "")).lower() in {"user", "assistant"}
+            for turn in conversation_history
+        )
+
+    def _should_rewrite_query(
+        self,
+        query: str,
+        conversation_history: Optional[List[Dict[str, Any]]] = None,
+    ) -> bool:
+        """
+        Rewrite only when ALL are true:
+          - short query (<= 3 tokens)
+          - no intent words
+          - no conversation history
+        """
+        return (
+            self._is_short_query(query)
+            and not self._has_intent_words(query)
+            and not self._has_conversation_history(conversation_history)
+        )
+
+    def _rewrite_query(self, query: str) -> str:
+        """
+        Use LLM to expand a vague user query into a richer search query.
+
+        Uses the fast 8B model for speed (~200ms via Groq).
+        Falls back to original query on any error.
+        """
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            return query
+
+        max_retries = 3
+        retry_delay = 1.0
+        
+        for attempt in range(max_retries):
+            try:
+                from groq import Groq
+                client = Groq(api_key=api_key)
+                resp = client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": self.REWRITE_PROMPT},
+                        {"role": "user", "content": f"Input: {query}\nOutput:"},
+                    ],
+                    model="llama-3.1-8b-instant",  # Fast model for rewriting
+                    temperature=0.0,
+                    max_tokens=150,
+                )
+                rewritten = resp.choices[0].message.content.strip()
+                
+                # Post-processing to remove common LLM conversational filler
+                cleanup_phrases = [
+                    "The rewritten query is:",
+                    "Rewritten query:",
+                    "Expanded query:",
+                    "Revised query:",
+                    "Output:",
+                    "Here is the expanded query:",
+                    "Here is the rewritten query:",
+                ]
+                for phrase in cleanup_phrases:
+                    if rewritten.lower().startswith(phrase.lower()):
+                        rewritten = rewritten[len(phrase):].strip()
+                
+                # Remove leading/trailing quotes often added by LLMs
+                rewritten = rewritten.strip(' "')
+
+                # Sanity check: if rewrite is too long or empty, use original
+                if not rewritten or len(rewritten) > 500:
+                    logger.warning(f"Query rewrite sanity check failed: '{rewritten}'")
+                    return query
+                return rewritten
+            except Exception as e:
+                if "429" in str(e):
+                    if attempt < max_retries - 1:
+                        logger.warning(f"Query rewriter Rate Limit hit. Retrying in {retry_delay}s...")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2
+                        continue
+                    else:
+                        logger.warning("Query rewriter hit max retries for 429. Using original query.")
+                        return query
+                logger.warning(f"Query rewrite failed, using original: {e}")
+                return query
+
+    # ------------------------------------------------------------------ #
     #  Public API                                                         #
     # ------------------------------------------------------------------ #
 
@@ -89,6 +229,7 @@ class QueryPipeline:
         doc_type: Optional[str] = None,
         source: Optional[str] = None,
         skip_generation: bool = False,
+        conversation_history: Optional[List[Dict[str, Any]]] = None,
     ) -> QueryResult:
         """
         Run the full query pipeline.
@@ -99,6 +240,8 @@ class QueryPipeline:
             doc_type:        Optional metadata filter by doc_type.
             source:          Optional metadata filter by source filename.
             skip_generation: If True, skip the LLM generation step.
+            conversation_history: Optional prior turns; any user/assistant turn
+                                  disables query rewriting.
 
         Returns:
             QueryResult with hits, answer, citations, and timings.
@@ -106,13 +249,24 @@ class QueryPipeline:
         timings: Dict[str, float] = {}
         retrieval_k = top_k or self.config.get("retrieval", {}).get("top_k", 10)
 
-        # 1. Embed query
+        # 0. Query rewriting (expand vague queries for better retrieval)
+        search_query = query
+        if (
+            self.config.get("retrieval", {}).get("query_rewrite", False)
+            and self._should_rewrite_query(query, conversation_history)
+        ):
+            with timer("rewrite", timings):
+                search_query = self._rewrite_query(query)
+                if search_query != query:
+                    logger.info(f"Query rewritten: '{query}' → '{search_query}'")
+
+        # 1. Embed query (use rewritten version for search)
         embedder = self._get_embedder()
         with timer("embed", timings):
             if hasattr(embedder, "embed_query"):
-                query_vector = embedder.embed_query(query)
+                query_vector = embedder.embed_query(search_query)
             else:
-                query_vector = embedder.embed([query])
+                query_vector = embedder.embed([search_query])
 
         # 2. Search Qdrant
         store = self._get_store()
@@ -124,17 +278,33 @@ class QueryPipeline:
                 source=source,
             )
 
-        # 3. Rerank (optional)
+        # 3. Rerank (optional) — use rewritten query for better ranking
         reranker = self._get_reranker()
         with timer("rerank", timings):
-            hits = reranker.rerank(query, hits)
+            hits = reranker.rerank(search_query, hits)
+
+        # 3.5 Deduplicate near-identical chunks
+        dedup_threshold = self.config.get("retrieval", {}).get(
+            "dedup_threshold", 0.9
+        )
+        if dedup_threshold < 1.0:
+            pre_dedup = len(hits)
+            hits = self._deduplicate_hits(hits, dedup_threshold)
+            if len(hits) < pre_dedup:
+                logger.info(
+                    f"Dedup removed {pre_dedup - len(hits)} near-duplicate chunks"
+                )
 
         # 4. Generate answer (optional)
         answer = ""
         if not skip_generation:
             generator = self._get_generator()
             with timer("generate", timings):
-                answer = generator.generate(query, hits)
+                answer = generator.generate(
+                    query,
+                    hits,
+                    conversation_history=conversation_history,
+                )
 
         # 5. Build citations
         citations = self._build_citations(hits)
@@ -146,6 +316,42 @@ class QueryPipeline:
             citations=citations,
             timings=timings,
         )
+
+    @staticmethod
+    def _deduplicate_hits(
+        hits: List[Hit], threshold: float = 0.9
+    ) -> List[Hit]:
+        """
+        Remove near-duplicate chunks using Jaccard word-set similarity.
+
+        Keeps the first (highest-scored) chunk and drops later chunks
+        whose word overlap with any already-kept chunk exceeds `threshold`.
+        """
+        if not hits:
+            return hits
+
+        def _word_set(text: str) -> set:
+            return set(text.lower().split())
+
+        def _jaccard(a: set, b: set) -> float:
+            if not a or not b:
+                return 0.0
+            return len(a & b) / len(a | b)
+
+        kept: List[Hit] = []
+        kept_words: List[set] = []
+
+        for hit in hits:
+            text = hit.chunk.raw_text or hit.chunk.text
+            words = _word_set(text)
+            is_dup = any(
+                _jaccard(words, kw) >= threshold for kw in kept_words
+            )
+            if not is_dup:
+                kept.append(hit)
+                kept_words.append(words)
+
+        return kept
 
     @staticmethod
     def _build_citations(hits: List[Hit]) -> List[Dict[str, Any]]:

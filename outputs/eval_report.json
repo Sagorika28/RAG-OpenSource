@@ -1,0 +1,124 @@
+{
+  "config_file": "data/eval/questions.jsonl",
+  "num_queries": 3,
+  "k_values": [
+    1,
+    3,
+    5
+  ],
+  "retrieval_metrics": {
+    "recall@1": 0.6667,
+    "mrr@1": 0.6667,
+    "ndcg@1": 0.6667,
+    "recall@3": 1.0,
+    "mrr@3": 0.8333,
+    "ndcg@3": 0.877,
+    "recall@5": 1.0,
+    "mrr@5": 0.8333,
+    "ndcg@5": 0.877
+  },
+  "generation_metrics": {
+    "faithfulness": 5.0,
+    "relevance": 5.0,
+    "completeness": 5.0,
+    "overall": 5.0
+  },
+  "latency_summary": {
+    "embed_ms": {
+      "mean": 2278.4,
+      "p50": 24.12,
+      "p95": 6790.71,
+      "min": 20.38,
+      "max": 6790.71
+    },
+    "generate_ms": {
+      "mean": 1007.36,
+      "p50": 907.67,
+      "p95": 1294.26,
+      "min": 820.14,
+      "max": 1294.26
+    },
+    "rerank_ms": {
+      "mean": 2199.68,
+      "p50": 1610.6,
+      "p95": 3460.59,
+      "min": 1527.84,
+      "max": 3460.59
+    },
+    "search_ms": {
+      "mean": 5.32,
+      "p50": 5.57,
+      "p95": 6.17,
+      "min": 4.22,
+      "max": 6.17
+    }
+  },
+  "index_stats": {
+    "collection": "rag_os_chunks",
+    "points_count": 4214,
+    "status": "green",
+    "vector_size": 384
+  },
+  "per_query_results": [
+    {
+      "question": "What is the Montreal Protocol?",
+      "gold_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "retrieved_sources": [
+        "0024_1-Success-Story-Book-2022.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0027_4-GHG-Report.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0026_3-Passive-and-low-energy-cooling-strategies.pdf"
+      ],
+      "answer": "The Montreal Protocol is an international environmental treaty designed to protect the stratospheric ozone layer by phasing out the production and consumption of ozone-depleting substances (ODSs) [1][2][3][4][5]. It is considered one of the most successful global environmental agreements, with a set of practical, actionable tasks to achieve this goal [2][3]. The protocol was adopted on September 16, 1987, and entered into force in 1989 [1][3][5]. It has been ratified by all 198 member-states of the United Nations and is legally binding [5]. The treaty aims to protect human health, economies, and ecosystems by reducing the production and consumption of ODSs, such as chlorofluorocarbons (CFCs) and hydrochlorofluorocarbons (HCFCs) [1][5]. India, as a party to the protocol since 1992, has successfully implemented the treaty and phased out CFCs and halons [4][5]. The protocol has undergone several amendments since its adoption, with the goal of accelerating the phase-out of ODSs [5].",
+      "timings": {
+        "embed_ms": 6790.71,
+        "search_ms": 6.17,
+        "rerank_ms": 3460.59,
+        "generate_ms": 1294.26
+      }
+    },
+    {
+      "question": "What are the safety measures for Ammonia installation?",
+      "gold_sources": [
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf"
+      ],
+      "retrieved_sources": [
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf"
+      ],
+      "answer": "When handling ammonia, strict safety protocols are essential [1]. Systems must be equipped with sensors calibrated to detect refrigerant concentrations near their Lower Flammability Limits (LFL), and emergency alarms, ventilation controls, and well-documented evacuation procedures are mandatory [1]. Ammonia is a hazardous substance that can cause serious health effects, including skin, eye, and respiratory irritation, and can lead to painful irritation and severe chemical burns [2]. To mitigate these risks, it is essential to follow the guidelines outlined in IS 4544:2025 for the safe handling and storage of ammonia [3]. Preventive measures should be in place to minimize the risk of leaks or accidents, and cleaning and repair activities must strictly adhere to the procedures specified in IS 4544:2025 [3]. In the event of exposure, the affected person should be immediately moved to fresh air, and any contact with the eyes or skin should be treated by flushing with plenty of running water [3]. Additionally, waste disposal must be carried out following local, state, and central pollution control regulations to ensure environmental safety [3]. Facilities should also maintain ammonia masks, safety valves, and firefighting systems [4].",
+      "timings": {
+        "embed_ms": 20.38,
+        "search_ms": 5.57,
+        "rerank_ms": 1610.6,
+        "generate_ms": 820.14
+      }
+    },
+    {
+      "question": "What are suggested O&M practices for cold chain technologies?",
+      "gold_sources": [
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf"
+      ],
+      "retrieved_sources": [
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0004_Study-on-best-practices-for-installation-and-maintenance-of-Ammonia-Low-GWP-alternatives-technologies-in-the-Cold-Chain-Infrastructure.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf",
+        "0009_3-Guidebook-on-Sustainable-Technologies-for-Cold-Chain-Sector.pdf"
+      ],
+      "answer": "Effective O&M practices are crucial for the consistent and efficient operation of refrigeration systems, storage facilities, and reefer transports [5]. Suggested O&M practices for cold storages include implementing and controlling storage activities, monitoring temperature and humidity levels, and maintaining an inventory of spare parts [3]. Additionally, regular inspection and maintenance of refrigeration systems, implementation of a monitoring system, and addressing refrigerant leaks immediately are recommended [3]. For packhouses, suggested practices include checking the functioning of all components of refrigeration systems, calibrating measuring equipment, and ensuring proper airflow through the pre-cooling system [4]. It is also important to train personnel on proper procedures, maintain documentation, and develop emergency response plans [4]. Regular inspections, maintenance schedules, and calibration schedules should be established to ensure smooth operations [3][4].",
+      "timings": {
+        "embed_ms": 24.12,
+        "search_ms": 4.22,
+        "rerank_ms": 1527.84,
+        "generate_ms": 907.67
+      }
+    }
+  ]
+}

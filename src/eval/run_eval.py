@@ -1,5 +1,5 @@
 """
-src/eval/run_eval.py — Evaluation runner.
+src/eval/run_eval.py — Evaluation runner (v2: reusable pipeline support).
 
 CLI entry point that:
   1. Loads config + eval dataset
@@ -14,12 +14,15 @@ from __future__ import annotations
 import json
 import logging
 import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Dict
 
 from src.core.config import load_config
 from src.core.utils import setup_logging
 from src.eval.datasets import load_eval_dataset
+from src.eval.llm_judge import LLMJudge
 from src.eval.metrics import aggregate_latencies, compute_retrieval_metrics
 from src.pipeline.query import QueryPipeline
 
@@ -31,6 +34,8 @@ def run_evaluation(
     eval_path: str | Path | None = None,
     output_path: str | Path | None = None,
     k_values: list[int] | None = None,
+    pipeline: "QueryPipeline | None" = None,
+    max_workers: int | None = None,
 ) -> Dict[str, Any]:
     """
     Run the full evaluation.
@@ -40,6 +45,9 @@ def run_evaluation(
         eval_path:   Path to questions.jsonl (falls back to config).
         output_path: Where to write the JSON report (optional).
         k_values:    k values for retrieval metrics.
+        pipeline:    Optional existing QueryPipeline to reuse (avoids Qdrant lock conflicts).
+        max_workers: Number of worker threads. Defaults to config["eval"]["max_workers"]
+                     or 1 for safe single-thread execution.
 
     Returns:
         Evaluation report as a dict.
@@ -56,21 +64,33 @@ def run_evaluation(
         logger.error("No evaluation examples loaded — aborting")
         return {"error": "empty dataset"}
 
-    # Initialize query pipeline
-    pipeline = QueryPipeline(config)
+    # Initialize query pipeline (reuse if provided)
+    if pipeline is None:
+        pipeline = QueryPipeline(config)
 
     # Run each example
     all_retrieved: list[list[str]] = []
     all_gold: list[list[str]] = []
     all_timings: list[dict[str, float]] = []
     per_query_results: list[dict] = []
+    judge_inputs: list[dict] = []
 
-    for i, example in enumerate(examples):
-        logger.info(f"Eval [{i+1}/{len(examples)}]: {example.question[:80]}...")
+    per_query_results: list[dict] = [None] * len(examples)  # type: ignore
+    judge_inputs: list[dict] = []
+
+    # Determine if generation should be enabled for LLM judge
+    gen_cfg = config.get("generation", {})
+    gen_enabled = gen_cfg.get("enabled", False)
+
+    def _process_example(idx: int, example: Any):
+        logger.info(f"Eval [{idx+1}/{len(examples)}]: {example.question[:80]}...")
+        
+        # Add a tiny staggered start to avoid hitting rate limits instantly
+        time.sleep(idx * 0.1)
 
         result = pipeline.run(
             query=example.question,
-            skip_generation=True,  # No need for generation during eval
+            skip_generation=not gen_enabled,
         )
 
         # Extract retrieved sources
@@ -78,17 +98,83 @@ def run_evaluation(
             hit.chunk.metadata.get("source", "")
             for hit in result.hits
         ]
-        all_retrieved.append(retrieved_sources)
-        all_gold.append(example.gold_sources)
-        all_timings.append(result.timings)
-
-        # Per-query detail
-        per_query_results.append({
-            "question": example.question,
+        
+        # Return package for aggregation
+        return {
+            "idx": idx,
+            "retrieved_sources": retrieved_sources,
             "gold_sources": example.gold_sources,
-            "retrieved_sources": retrieved_sources[:10],
             "timings": result.timings,
-        })
+            "answer": result.answer,
+            "question": example.question,
+            "hits": result.hits,
+        }
+
+    if max_workers is None:
+        max_workers = int(config.get("eval", {}).get("max_workers", 1))
+    max_workers = max(1, int(max_workers))
+
+    if max_workers == 1:
+        logger.info("Running evaluation in single-thread mode")
+        for i, ex in enumerate(examples):
+            try:
+                res = _process_example(i, ex)
+                idx = res["idx"]
+                per_query_results[idx] = {
+                    "question": res["question"],
+                    "gold_sources": res["gold_sources"],
+                    "retrieved_sources": res["retrieved_sources"][:10],
+                    "answer": res["answer"] if gen_enabled else "(skipped)",
+                    "timings": res["timings"],
+                }
+                if gen_enabled and res["answer"]:
+                    judge_inputs.append({
+                        "question": res["question"],
+                        "hits": res["hits"],
+                        "answer": res["answer"],
+                        "idx": idx,
+                    })
+            except Exception as e:
+                logger.error(f"Eval failed for example {i+1}: {e}")
+    else:
+        logger.info(f"Running evaluation in parallel mode (workers={max_workers})")
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [
+                executor.submit(_process_example, i, ex)
+                for i, ex in enumerate(examples)
+            ]
+
+            for future in futures:
+                try:
+                    res = future.result()
+                    idx = res["idx"]
+
+                    # Collect results in order
+                    per_query_results[idx] = {
+                        "question": res["question"],
+                        "gold_sources": res["gold_sources"],
+                        "retrieved_sources": res["retrieved_sources"][:10],
+                        "answer": res["answer"] if gen_enabled else "(skipped)",
+                        "timings": res["timings"],
+                    }
+
+                    if gen_enabled and res["answer"]:
+                        judge_inputs.append({
+                            "question": res["question"],
+                            "hits": res["hits"],
+                            "answer": res["answer"],
+                            "idx": idx,
+                        })
+                except Exception as e:
+                    logger.error(f"Parallel eval failed for an example: {e}")
+
+    # Re-sort judge_inputs to maintain original order for report consistency
+    judge_inputs.sort(key=lambda x: x["idx"])
+
+    # Flatten for metric computation
+    all_retrieved = [r["retrieved_sources"] for r in per_query_results if r]
+    all_gold = [r["gold_sources"] for r in per_query_results if r]
+    all_timings = [r["timings"] for r in per_query_results if r]
 
     # Compute metrics
     retrieval_metrics = compute_retrieval_metrics(
@@ -103,12 +189,21 @@ def run_evaluation(
     except Exception:
         index_stats = {}
 
+    # Run LLM-as-a-Judge
+    generation_metrics = {}
+    if gen_enabled and judge_inputs:
+        logger.info(f"Running LLM Judge on {len(judge_inputs)} answers...")
+        judge = LLMJudge(config.get("generation", {}))
+        generation_metrics = judge.evaluate_batch(judge_inputs)
+        logger.info(f"Judge scores: {generation_metrics}")
+
     # Build report
     report = {
         "config_file": str(eval_path),
         "num_queries": len(examples),
         "k_values": k_values,
         "retrieval_metrics": retrieval_metrics,
+        "generation_metrics": generation_metrics,
         "latency_summary": latency_summary,
         "index_stats": index_stats,
         "per_query_results": per_query_results,
@@ -132,6 +227,8 @@ def run_evaluation(
 def main():
     """Run evaluation from the command line."""
     import argparse
+    from dotenv import load_dotenv
+    load_dotenv()
 
     parser = argparse.ArgumentParser(
         description="Run RAG-OS evaluation harness"
@@ -158,6 +255,12 @@ def main():
         default=[1, 3, 5, 10],
         help="k values for retrieval metrics",
     )
+    parser.add_argument(
+        "--workers", "-w",
+        type=int,
+        default=None,
+        help="Number of eval workers (default: config.eval.max_workers or 1)",
+    )
     args = parser.parse_args()
 
     setup_logging()
@@ -168,6 +271,7 @@ def main():
         eval_path=args.eval_file,
         output_path=args.output,
         k_values=args.k,
+        max_workers=args.workers,
     )
 
     # Print summary
@@ -179,6 +283,11 @@ def main():
     print("\n--- Retrieval Metrics ---")
     for key, value in report.get("retrieval_metrics", {}).items():
         print(f"  {key}: {value}")
+
+    if report.get("generation_metrics"):
+        print("\n--- Generation Quality (LLM Judge) ---")
+        for key, value in report["generation_metrics"].items():
+            print(f"  {key}: {value}/5")
 
     print("\n--- Latency Summary ---")
     for key, stats in report.get("latency_summary", {}).items():

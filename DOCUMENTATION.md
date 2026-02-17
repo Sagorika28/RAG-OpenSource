@@ -13,7 +13,8 @@ graph LR
     Chunker --> Embed[BGE Embeddings]
     Embed --> VectorDB[(Qdrant Local)]
     
-    User[User Query] --> Embed
+    User[User Query] --> Rewrite[Query Rewriting]
+    Rewrite --> Embed
     VectorDB --> Retr["Retrieval (Top-K)"]
     Retr --> Rerank[Cross-Encoder Reranker]
     Rerank --> Context[Context Construction]
@@ -60,24 +61,48 @@ The application is designed to run in two environments using a configuration-dri
 | **LLM** | Local Ollama (Privacy) | Groq API (Speed) |
 | **Storage** | Local Disk (`./qdrant_data`) | Git-tracked (`./qdrant_data`) |
 
+### 3.1 Advanced Pipelines
+- **Query Rewriting**: Uses `llama-3.1-8b-instant` to expand vague technician queries (e.g., "how to service ac") into rich technical search terms (e.g., "HVAC maintenance procedures, leak detection, refrigerant recovery").
+- **Synthetic Evaluation**: `src/scripts/generate_synthetic_eval.py` samples content from the vector store and uses an LLM to generate realistic questions, allowing for large-scale, automated evaluation without manual labeling.
+- **Parallel Processing**: Evaluation queries and LLM judging are parallelized (4 concurrent workers) using `ThreadPoolExecutor`, reducing evaluation time by ~75%.
+- **Resilience**: Integrated exponential backoff for all API calls to handle `429 Too Many Requests` gracefully.
+
 ## 4. Performance Metrics
 
-Measured on Apple Silicon (M2/M4) and Groq API:
+Measured on Apple Silicon (M2/M4) with Groq API (Llama 3.3 70B):
 
 ### Latency Profiles (P50)
 | Component | Latency | Solution |
 |-----------|---------|----------|
-| **Embedding** | **~15ms** | BGE-Small (Cached) |
-| **Vector Search** | **~4.5ms** | Qdrant (HNSW Index) |
-| **Reranking** | ~1.5s | Cross-Encoder (CPU) |
-| **Generation** | **~500ms** | Groq LPU (Llama 3 8B) |
+| **Embedding** | **~19ms** | BGE-Small (Cached) |
+| **Vector Search** | **~5.7ms** | Qdrant (HNSW Index) |
+| **Reranking** | ~1.56s | Cross-Encoder (CPU) |
+| **Generation** | **~998ms** | Groq LPU (Llama 3.3 70B) |
 
-> **Total End-to-End Latency**: ~2.5s (with Reranker) / ~0.8s (without Reranker).
+> **Total End-to-End Latency**: ~2.6s (with Reranker) / ~1.0s (without Reranker).
 
-### Retrieval Quality
-Evaluation on domain-specific technical queries shows **100% Recall@3** (correct document found in top 3 results), significantly outperforming keyword-only search for semantic queries.
+### Retrieval Quality (Robust Suite, N=20)
+| Metric | @1 | @3 | @5 |
+|--------|-----|------|------|
+| **Recall** | 45.0% | 65.0% | **75.0%** |
+| **MRR** | 51.2% | 58.7% | 60.1% |
+| **nDCG** | 52.4% | 61.1% | 62.3% |
+
+> **Note**: These metrics are calculated over 20 synthetic queries generated from the actual document index, providing a much more reliable indicator than the original 3-query baseline.
+
+### Generation Quality (LLM-as-a-Judge)
+Answers are evaluated automatically using an LLM judge that scores on three dimensions (0–5):
+| Dimension | Score | Description |
+|-----------|-------|-------------|
+| **Faithfulness** | **5/5** | Every claim grounded in retrieved context |
+| **Relevance** | **5/5** | Directly and precisely answers the question |
+| **Completeness** | **5/5** | Covers all key information from context |
+| **Overall** | **5.0/5** | Weighted average |
 
 ## 5. Unique Features
+- **LLM-as-a-Judge**: Automated answer quality evaluation (Faithfulness, Relevance, Completeness).
+- **Retrieval Deduplication**: Jaccard similarity-based filtering removes near-duplicate chunks (>90% word overlap) to ensure diverse Top-K results.
+- **Evaluation Dashboard**: In-app Streamlit dashboard showing retrieval metrics (Recall, MRR, nDCG) and generation quality scores with per-query breakdown.
 - **"Retrieval Only" Mode**: Returns sources instantly without waiting for LLM.
 - **Citation Precision**: Answers cite sources using numeric brackets `[1]` linked to specific retrieved chunks.
 - **Zero-Docker Requirement**: Can run entirely as a Python script or Streamlit app.
@@ -86,3 +111,4 @@ Evaluation on domain-specific technical queries shows **100% Recall@3** (correct
 - **Multi-Modal Support**: Parse charts and images in PDFs.
 - **GraphRAG**: Link chunks via entities (e.g., "Refrigerant X" mentions).
 - **User Feedback**: Capture thumbs up/down to fine-tune retrieval.
+- **Semantic Deduplication**: Embedding-level duplicate detection across documents.

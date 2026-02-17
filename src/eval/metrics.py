@@ -70,6 +70,7 @@ def ndcg_at_k(
     Normalized Discounted Cumulative Gain@k.
 
     Uses binary relevance: 1 if source is in gold set, else 0.
+    Each gold source is counted at most once (first occurrence).
 
     Args:
         retrieved_sources: Source filenames (ordered by score).
@@ -81,11 +82,13 @@ def ndcg_at_k(
     """
     gold = set(gold_sources)
 
-    # DCG for retrieved order
+    # DCG for retrieved order — count each gold source only once
     dcg = 0.0
+    seen_gold: set = set()
     for i, src in enumerate(retrieved_sources[:k]):
-        rel = 1.0 if src in gold else 0.0
-        dcg += rel / math.log2(i + 2)  # i+2 because log2(1)=0
+        if src in gold and src not in seen_gold:
+            dcg += 1.0 / math.log2(i + 2)  # i+2 because log2(1)=0
+            seen_gold.add(src)
 
     # Ideal DCG (all gold items first)
     ideal_rels = [1.0] * min(len(gold), k) + [0.0] * max(0, k - len(gold))
