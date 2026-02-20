@@ -9,6 +9,7 @@ Docling fails.
 from __future__ import annotations
 
 import logging
+import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
@@ -24,6 +25,9 @@ class DoclingParser(BaseParser):
     def __init__(self, config: Dict[str, Any] | None = None):
         super().__init__(config)
         self._fallback_parser = None
+        self._selective_ocr_enabled = self.config.get(
+            "selective_ocr_enabled", False
+        )
 
         # Lazy-load fallback if enabled
         if self.config.get("fallback_enabled", False):
@@ -44,22 +48,39 @@ class DoclingParser(BaseParser):
         if not pdf_path.exists():
             raise FileNotFoundError(f"PDF not found: {pdf_path}")
 
+        parse_path = pdf_path
+        tmp_dir_obj: tempfile.TemporaryDirectory[str] | None = None
+        if self._selective_ocr_enabled:
+            from src.parsing.selective_ocr import ocr_pdf_selective
+
+            tmp_dir_obj = tempfile.TemporaryDirectory(prefix="rag_os_ocr_")
+            ocr_path = Path(tmp_dir_obj.name) / f"{pdf_path.stem}.ocr.pdf"
+            parse_path = ocr_pdf_selective(pdf_path, ocr_path)
+
         try:
-            doc = self._parse_with_docling(pdf_path)
+            doc = self._parse_with_docling(parse_path)
+            doc.source = pdf_path.name
             # If Docling returned empty content, try fallback
             if not doc.raw_text.strip() and self._fallback_parser is not None:
                 logger.warning(
                     f"Docling returned empty content for {pdf_path.name} "
                     f"— falling back to PyMuPDF"
                 )
-                return self._fallback_parser.parse(pdf_path)
+                fallback_doc = self._fallback_parser.parse(parse_path)
+                fallback_doc.source = pdf_path.name
+                return fallback_doc
             return doc
         except Exception as e:
             logger.warning(f"Docling failed on {pdf_path.name}: {e}")
             if self._fallback_parser is not None:
                 logger.info(f"Falling back to PyMuPDF for {pdf_path.name}")
-                return self._fallback_parser.parse(pdf_path)
+                fallback_doc = self._fallback_parser.parse(parse_path)
+                fallback_doc.source = pdf_path.name
+                return fallback_doc
             raise
+        finally:
+            if tmp_dir_obj is not None:
+                tmp_dir_obj.cleanup()
 
     def _parse_with_docling(self, pdf_path: Path) -> Document:
         """

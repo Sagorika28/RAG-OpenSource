@@ -12,6 +12,7 @@ from typing import Any, Dict, List
 
 import numpy as np
 
+from src.core.device import resolve_torch_device
 from src.embeddings.base import BaseEmbedder
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,10 @@ class BGESmallEmbedder(BaseEmbedder):
         self._model = None
         self._dimension = self.config.get("dimension", 384)
         self._batch_size = self.config.get("batch_size", 32)
-        self._device = self.config.get("device", "cpu")
+        self._device = resolve_torch_device(
+            self.config.get("device", "auto"),
+            component="embeddings",
+        )
         self._model_name = self.config.get(
             "model_name", "BAAI/bge-small-en-v1.5"
         )

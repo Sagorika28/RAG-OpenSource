@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import logging
 import os
+import re
+import time
 from typing import Any, Dict, List, Optional
 
 from src.core.config import get_section
@@ -94,6 +96,64 @@ class QueryPipeline:
         "- Output ONLY the expanded query string.\n"
     )
 
+    _INTENT_WORDS = {
+        "how",
+        "what",
+        "why",
+        "steps",
+        "procedure",
+        "limit",
+        "maximum",
+        "minimum",
+        "define",
+        "meaning",
+        "error",
+        "fix",
+        "troubleshoot",
+    }
+
+    @staticmethod
+    def _tokenize(text: str) -> List[str]:
+        return re.findall(r"[A-Za-z0-9_]+", text.lower())
+
+    def _is_short_query(self, query: str) -> bool:
+        """A query is short if it has <= 3 tokens."""
+        return len(self._tokenize(query)) <= 3
+
+    def _has_intent_words(self, query: str) -> bool:
+        """Intent exists if query contains any configured intent words."""
+        tokens = set(self._tokenize(query))
+        return any(word in tokens for word in self._INTENT_WORDS)
+
+    @staticmethod
+    def _has_conversation_history(
+        conversation_history: Optional[List[Dict[str, Any]]]
+    ) -> bool:
+        """History exists if at least one prior user/assistant turn is present."""
+        if not conversation_history:
+            return False
+        return any(
+            str(turn.get("role", "")).lower() in {"user", "assistant"}
+            for turn in conversation_history
+        )
+
+    def _should_rewrite_query(
+        self,
+        query: str,
+        conversation_history: Optional[List[Dict[str, Any]]] = None,
+    ) -> bool:
+        """
+        Rewrite only when ALL are true:
+          - short query (<= 3 tokens)
+          - no intent words
+          - no conversation history
+        """
+        return (
+            self._is_short_query(query)
+            and not self._has_intent_words(query)
+            and not self._has_conversation_history(conversation_history)
+        )
+
     def _rewrite_query(self, query: str) -> str:
         """
         Use LLM to expand a vague user query into a richer search query.
@@ -169,6 +229,7 @@ class QueryPipeline:
         doc_type: Optional[str] = None,
         source: Optional[str] = None,
         skip_generation: bool = False,
+        conversation_history: Optional[List[Dict[str, Any]]] = None,
     ) -> QueryResult:
         """
         Run the full query pipeline.
@@ -179,6 +240,8 @@ class QueryPipeline:
             doc_type:        Optional metadata filter by doc_type.
             source:          Optional metadata filter by source filename.
             skip_generation: If True, skip the LLM generation step.
+            conversation_history: Optional prior turns; any user/assistant turn
+                                  disables query rewriting.
 
         Returns:
             QueryResult with hits, answer, citations, and timings.
@@ -188,7 +251,10 @@ class QueryPipeline:
 
         # 0. Query rewriting (expand vague queries for better retrieval)
         search_query = query
-        if self.config.get("retrieval", {}).get("query_rewrite", False):
+        if (
+            self.config.get("retrieval", {}).get("query_rewrite", False)
+            and self._should_rewrite_query(query, conversation_history)
+        ):
             with timer("rewrite", timings):
                 search_query = self._rewrite_query(query)
                 if search_query != query:
@@ -234,7 +300,11 @@ class QueryPipeline:
         if not skip_generation:
             generator = self._get_generator()
             with timer("generate", timings):
-                answer = generator.generate(query, hits)
+                answer = generator.generate(
+                    query,
+                    hits,
+                    conversation_history=conversation_history,
+                )
 
         # 5. Build citations
         citations = self._build_citations(hits)
