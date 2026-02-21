@@ -1,0 +1,609 @@
+{
+  "config_file": "data/eval/questions_robust.jsonl",
+  "num_queries": 30,
+  "k_values": [
+    1,
+    3,
+    5,
+    10
+  ],
+  "retrieval_metrics": {
+    "recall@1": 0.6786,
+    "mrr@1": 0.6786,
+    "ndcg@1": 0.6786,
+    "recall@3": 0.7857,
+    "mrr@3": 0.7262,
+    "ndcg@3": 0.7415,
+    "recall@5": 0.8214,
+    "mrr@5": 0.7351,
+    "ndcg@5": 0.7569,
+    "recall@10": 0.8214,
+    "mrr@10": 0.7351,
+    "ndcg@10": 0.7569
+  },
+  "generation_metrics": {
+    "faithfulness": 4.14,
+    "relevance": 4.86,
+    "completeness": 3.79,
+    "overall": 4.26
+  },
+  "latency_summary": {
+    "embed_ms": {
+      "mean": 2790.08,
+      "p50": 519.86,
+      "p95": 9462.78,
+      "min": 73.1,
+      "max": 24245.58
+    },
+    "generate_ms": {
+      "mean": 42450.38,
+      "p50": 31767.19,
+      "p95": 79825.62,
+      "min": 18445.21,
+      "max": 89391.78
+    },
+    "rerank_ms": {
+      "mean": 168768.65,
+      "p50": 85319.06,
+      "p95": 598215.44,
+      "min": 9621.41,
+      "max": 1287927.41
+    },
+    "search_ms": {
+      "mean": 390.32,
+      "p50": 416.49,
+      "p95": 720.51,
+      "min": 13.01,
+      "max": 737.0
+    }
+  },
+  "index_stats": {
+    "collection": "rag_os_chunks",
+    "points_count": 9000,
+    "status": "green",
+    "vector_size": 384
+  },
+  "per_query_results": [
+    {
+      "question": "What happens to the Dew Clean operation in the event of a main power reset or power failure?",
+      "gold_sources": [
+        "JTKJ50.pdf"
+      ],
+      "retrieved_sources": [
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf"
+      ],
+      "answer": "According to [1] and [4], in the event of a main power reset or power failure, the Dew Clean operation will come to an end. This is stated in Section m Notes on the Dew Clean operation: (Page 1-135) as \"Incase of a main power reset or power failure, the Dew Clean operation will come to an end.\" Additionally, [4] mentions that during the operation, the LED indicator lamp (green and orange) on the indoor unit shall blink simultaneously. \n\nSafety warning: Users are recommended to avoid staying inside the room during the Dew Clean operation, as the indoor temperature will be lower ([5], Section m Notes on the Dew Clean operation:, Page 1-135).",
+      "timings": {
+        "embed_ms": 6507.27,
+        "search_ms": 13.01,
+        "rerank_ms": 24336.48,
+        "generate_ms": 52890.68
+      }
+    },
+    {
+      "question": "What are the steps to diagnose reasons for improper cooling in an air conditioner, and what are some possible causes of this issue?",
+      "gold_sources": [
+        "0046_MC_Sr. Technician RACW Refrigeration Air Conditioning & Washing   Machine_V4.pdf"
+      ],
+      "retrieved_sources": [
+        "Technician Handbook.pdf",
+        "Technician Handbook.pdf",
+        "MS-Q18YNZA.pdf",
+        "lloyd-AC-common.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "To diagnose reasons for improper cooling in an air conditioner, follow these steps:\n\n1. Ensure the appliance is disconnected from the mains electric supply before carrying out any work on it [1].\n2. Check if the room temperature is too high or if there's a heating source nearby that may be affecting the air conditioner's performance [3].\n3. Verify that the air filter is clean and not blocking airflow [3].\n4. Inspect the electrical wiring and pipeline installation to ensure they are correct and not causing any malfunctions [4][5].\n\nPossible causes of improper cooling include:\n\n* Air circulation problems due to curtains, blinds, or furniture blocking the front of the air conditioner [3]\n* Dirty air filter reducing airflow [3]\n* High outside temperature affecting the cooling effect [3]\n* Incorrect installation leading to reduced capacity and efficiency by over 20% [4][5]\n\nSafety warning: Always ensure the appliance is disconnected from power before performing any work on it.",
+      "timings": {
+        "embed_ms": 177.49,
+        "search_ms": 32.6,
+        "rerank_ms": 439601.25,
+        "generate_ms": 89391.78
+      }
+    },
+    {
+      "question": "What is the maximum high-side pressure observed in the split AC tests?",
+      "gold_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "retrieved_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "ISO-5149-2.pdf"
+      ],
+      "answer": "Based on the provided sources [1][3], the maximum high-side pressure observed in the split AC tests is not explicitly stated. However, we can infer that the pressures mentioned are relative to a specific orifice size (7.03 mm or 4.11 mm) and test number.\n\nTo determine the maximum high-side pressure, we need more information about the absolute pressures used in the tests. Unfortunately, the provided sources do not contain enough information to answer this precisely.\n\nHowever, according to ISO-5149-2 [5], for fatigue testing, the upper-pressure value shall not be less than 0.7 x PS and the lower-pressure value shall not be greater than 0.2 x PS. This implies that the maximum high-side pressure is at least 0.7 times the specified pressure (PS).\n\nSafety warning: When working with refrigerants, always follow proper safety procedures to avoid exposure to high pressures and potential leaks.\n\nTo accurately determine the maximum high-side pressure observed in the split AC tests, further information or data from the test results would be required.",
+      "timings": {
+        "embed_ms": 386.27,
+        "search_ms": 247.35,
+        "rerank_ms": 102150.15,
+        "generate_ms": 64465.67
+      }
+    },
+    {
+      "question": "What factors must be considered when determining the size of power cables for an HVAC system?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "When determining the size of power cables for an HVAC system, consider the load [1][4]. The sizes of power cables should be as indicated in the tender specifications or approved by the Engineer-in-Charge after considering the load, length of cabling, and type of load [1].\n\nAdditionally, refer to Section 13.4 POWER CABLING, which states that for sizes up to and including 25 sq.mm, the conductor shall be copper, and above 16 sq.mm, it can be copper/aluminium [4]. The power cables should also be rated for continuous operation at the voltages required by high voltage equipment [4].\n\nSafety warning: Ensure proper heat dissipation and access to cables when laying them in cable trays or directly in ground. Cable trays must be fabricated from slotted angle/solid angles or steel sheet with adequate structural strength and rigidity, with necessary ventilation holes [5].",
+      "timings": {
+        "embed_ms": 1433.86,
+        "search_ms": 271.76,
+        "rerank_ms": 71056.61,
+        "generate_ms": 57063.57
+      }
+    },
+    {
+      "question": "What is a critical requirement for technicians handling R-290 and HFC-32 refrigerants?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Technician Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "answer": "Technicians handling R-290 and HFC-32 refrigerants must be well-trained [1] and always use Personal Protective Equipment (PPE) [1]. Additionally, they should have knowledge of regulations and standards relating to flammable refrigerants [2], as both R-290 and HFC-32 are considered hazardous. Specifically, technicians handling R-290 need to consider its high flammability, while those handling HFC-32 must be aware of its miscibility with POE lubricants, which can be hygroscopic [2]. Safety precautions should always take precedence when working with these refrigerants.\n\n**Safety Warning:** When handling R-290 and HFC-32 refrigerants, technicians are at risk of exposure to flammable gases. Always follow proper ventilation procedures and use PPE as recommended in the Technician Handbook.pdf [1].",
+      "timings": {
+        "embed_ms": 366.87,
+        "search_ms": 335.35,
+        "rerank_ms": 14501.73,
+        "generate_ms": 36155.02
+      }
+    },
+    {
+      "question": "What regulator pressure range is recommended for passing Nitrogen through a tube to prevent oxide formation during brazing?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf"
+      ],
+      "answer": "To prevent oxide formation on the inside of tubes during brazing, slowly pass Nitrogen through the tube at a regulator pressure of about 0.5 bar [1] to 1 bar [1]. This is in addition to using a 2-stage regulator for regulating the output pressure of nitrogen gas from the cylinder to safe working limits of about 15-20 bar (220-290 psig) [2][3], as excessive pressure can cause serious accidents.",
+      "timings": {
+        "embed_ms": 73.1,
+        "search_ms": 60.63,
+        "rerank_ms": 38392.35,
+        "generate_ms": 27052.04
+      }
+    },
+    {
+      "question": "What is the mathematical formula to calculate pressure, and what are the units of measurement for the force applied in this calculation?",
+      "gold_sources": [
+        "Trainer Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "answer": "To calculate pressure, use the formula: p = F/A [1][2], where:\n- p = pressure in psi (or kPa)\n- F = force in pounds (or Newton) [1]\n- A = area in square inch (or m^2)\n\nThe unit of force is proportional to mass 'm' and acceleration 'a', expressed as: Force = mass * acceleration (m*a) [1][2].\n\nThe units of measurement for the force applied are:\n- N (Newton)\n- lbf (pounds-force)\n- kgf (kilogram-force)",
+      "timings": {
+        "embed_ms": 368.78,
+        "search_ms": 442.91,
+        "rerank_ms": 50594.42,
+        "generate_ms": 30871.63
+      }
+    },
+    {
+      "question": "What are the two common types of variable restriction controls that have changing opening areas of flow depending on the type of control?",
+      "gold_sources": [
+        "Trainer Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "The two common types of variable restriction controls with changing opening areas of flow are:\n\nAutomatic Expansion Valve (Pressure Control) [1][2]\nThermostatic Expansion Valve [1][2]\n\nNote: These devices adjust their opening area based on the type of control, such as pressure or temperature.",
+      "timings": {
+        "embed_ms": 342.27,
+        "search_ms": 286.27,
+        "rerank_ms": 73774.71,
+        "generate_ms": 18445.21
+      }
+    },
+    {
+      "question": "What is required to manage OPC objects or BACnet stations that do not support any calendar or scheduler objects?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "To manage OPC objects or BACnet stations that do not support any calendar or scheduler objects, a higher-level schedule within the management software is required. This schedule controls additional objects and is used in conjunction with the BACnet schedule [1]. The management software must be able to read, change, and write to the BACnet stations again after modifying the schedule [1].\n\nSafety warning: Ensure that all modifications to the schedule are done in a controlled environment to prevent unintended consequences on the system operation.\n\nRequired tools: Management software with BACnet capabilities, access to the OPC objects or BACnet stations.\n\nRegulatory context: Not applicable to this specific requirement.",
+      "timings": {
+        "embed_ms": 250.98,
+        "search_ms": 252.68,
+        "rerank_ms": 106924.9,
+        "generate_ms": 68738.71
+      }
+    },
+    {
+      "question": "What are the key characteristics of a trainer's attitude, mood, and voice when delivering a training session?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "A trainer's attitude, mood, and voice are crucial during a training session. According to [1], a trainer should begin with a modest attitude, not an arrogant one, and display a cheerful mood rather than a depressed one. A sense of humor can be beneficial, but it shouldn't become the main focus [1]. The trainer's voice delivery should be firm, reflecting confidence in the subject matter [1]. Additionally, their body language should be positive and consistent with verbal communication to avoid confusing signals [1].\n\nWhen delivering training, a trainer should also be clear, concrete, concise, and consistent, as highlighted in [2]. This can be achieved by rehearsing before the session to imbibe these qualities.\n\nSafety warnings: None mentioned.\n\nRequired tools: None specified.\n\nRegulatory context: None relevant to this specific question.\n\nNote: The provided sources focus on trainer characteristics for effective training delivery, not refrigerant handling or HVAC systems.",
+      "timings": {
+        "embed_ms": 8431.31,
+        "search_ms": 630.23,
+        "rerank_ms": 218975.8,
+        "generate_ms": 56003.36
+      }
+    },
+    {
+      "question": "What types of materials can be degraded by UV-B radiation, and what could be the potential economic impact of mitigating this degradation?",
+      "gold_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "retrieved_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "answer": "According to [1], wood, plastic, rubber, fabrics, and many construction materials are degraded by UV-B radiation. Additionally, [2] states that synthetic polymers, naturally occurring biopolymers, and other materials of commercial interest can also be affected.\n\nThe economic impact of replacing and/or protecting these materials could be significant, as mentioned in [1]. Typical damages range from discoloration to loss of mechanical integrity, which could lead to decreased crop yields, damage to forests, and increased cases of cancer, as stated in [2] and [3].\n\nSafety warning: Prolonged exposure to UV-B radiation can cause eye damage, including cataracts, and skin damage, including increased risk of skin cancer.",
+      "timings": {
+        "embed_ms": 811.35,
+        "search_ms": 538.74,
+        "rerank_ms": 248379.15,
+        "generate_ms": 70440.38
+      }
+    },
+    {
+      "question": "What are the key components that a hazardous materials technician should review and demonstrate competency in, as per 29 CFR 1910.120(q), to ensure effective response to hazardous substance releases?",
+      "gold_sources": [
+        "osha2254.pdf"
+      ],
+      "retrieved_sources": [
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf"
+      ],
+      "answer": "A hazardous materials technician should review and demonstrate competency in performing the applicable skills of 29 CFR 1910.120(q) [1][2][3][4]. This includes reviewing and demonstrating competency in:\n\n* Analyzing an incident to determine the hazardous substances present, their physical and chemical properties, and the likely behavior of the hazardous substance and its container [1][2][3].\n* Selecting and using various types of equipment available for plugging or patching transportation containers, vessels, or vehicles [1][2].\n* Organizing and directing the use of multiple teams of hazardous material technicians and selecting the appropriate strategy for approaching release sites and containing the release [1][2].\n\nIt is also essential to review procedures for implementing continuing response actions consistent with the local emergency response plan, the organization's standard operating procedures, and the current edition of DOT's ERG [1][2][3]. Additionally, hazardous materials technicians should be familiar with OSHA standards 29 CFR 1910.120(q) and 1926.65(q).\n\n**Safety Warning:** When handling hazardous substances, always wear personal protective equipment (PPE), including gloves, safety glasses, and a face shield [5].\n\nRequired tools: Personal Protective Equipment (PPE), including gloves, safety glasses, and a face shield.\n\nRegulatory context: OSHA 29 CFR 1910.120(q) and 1926.65(q).",
+      "timings": {
+        "embed_ms": 4488.69,
+        "search_ms": 680.21,
+        "rerank_ms": 1287927.41,
+        "generate_ms": 79825.62
+      }
+    },
+    {
+      "question": "What are the key principles that personnel in the construction industry should adopt for building construction to achieve thermal comfort and environmental protection?",
+      "gold_sources": [
+        "0028_5-Booklet-for-sensitizing-building-community.pdf"
+      ],
+      "retrieved_sources": [
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf"
+      ],
+      "answer": "Based on the provided sources, the key principles that personnel in the construction industry should adopt for building construction to achieve thermal comfort and environmental protection include:\n\n1. Passive cooling techniques [3]\n2. Non-Ozone Depleting Substances (ODS) [2][4]\n3. Low Global Warming Potential (GWP) alternative technologies [2][3]\n4. Energy efficient building design, including incorporation of passive design elements for commercial buildings as per the Energy Conservation Building Codes (ECBC) [2]\n5. Adoption of non-HCFC/low-GWP alternatives [2][5]\n\nThese principles are recommended to reduce cooling demand, energy consumption, and refrigerant use, thereby achieving thermal comfort and environmental protection.\n\n**Safety Warning:** When handling refrigerants, always follow proper safety protocols, including wearing personal protective equipment (PPE) and ensuring adequate ventilation.",
+      "timings": {
+        "embed_ms": 509.93,
+        "search_ms": 572.9,
+        "rerank_ms": 156024.53,
+        "generate_ms": 51859.82
+      }
+    },
+    {
+      "question": "What tools are required for the repair and maintenance of a split air-conditioner charged with R-290 or HFC-32?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "For the repair and maintenance of a split air-conditioner charged with R-290 or HFC-32, you will need the following tools: pressure gauges [1], long hose for venting refrigerant [1], Evacuation and charging unit [1], R-290 leak detector [2], filter/drier [1], Nitrogen cylinder [2], soap solution [2], pliers [2], brazing torch [2], and temperature measuring devices [1]. \n\nSafety warning: When handling HFC-32, which is mildly flammable and has a high global warming potential of 675, ensure that the recovery unit and cylinders are suitable for this refrigerant type [3].\n\nRequired tools may vary depending on the specific system design and requirements. Always refer to the manufacturer's instructions and relevant regulations (e.g., EPA 608) for specific guidelines.\n\nNote: The provided documents do not contain enough information to answer this precisely regarding the exact sequence of tool usage or detailed procedural steps.",
+      "timings": {
+        "embed_ms": 1047.88,
+        "search_ms": 416.49,
+        "rerank_ms": 15827.78,
+        "generate_ms": 23398.89
+      }
+    },
+    {
+      "question": "What are the key issues of negotiation in the Montreal Protocol Meetings that relate to implementation and enforcement?",
+      "gold_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "retrieved_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0016_8-Study-on-Public-Procurement-Policies-Hiring-Trained-and-certified-technicians.pdf"
+      ],
+      "answer": "The provided documents do not contain enough information to answer this precisely. However, based on [1] and [2], we can infer that the key issues of negotiation at the Ex-Com meetings include:\n\n* Approval of cost funding guidelines for HFC phasedown in Article 5 countries\n* Funding window for Pilot projects to maintain and/or enhance energy efficiency of replacement technologies and equipment in the context of HFC phase-down\n* Enhanced funding for institutional strengthening projects\n* Criteria for funding window for an inventory of banks of used or unwanted controlled substances and a plan for the collection, transport, and disposal of such substances\n\nThese issues are related to implementation and enforcement of the Montreal Protocol.",
+      "timings": {
+        "embed_ms": 168.92,
+        "search_ms": 110.6,
+        "rerank_ms": 296481.67,
+        "generate_ms": 50470.87
+      }
+    },
+    null,
+    {
+      "question": "Where can details on instrumentation and the data acquisition and control system be found?",
+      "gold_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "retrieved_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "answer": "According to APPENDIX A in [1], details on instrumentation (measurement range, accuracy, precision, etc.) and the data acquisition and control (DAQ) system are provided.\n\nTo find this information, refer to APPENDIX A in source [1]. \n\nRequired tools: National Instruments hardware (cDAQ-9178, NI-9214, NI-9209, NI-9208, NI-9472), LabVIEW software.\n\nRegulatory context: Not applicable in this specific question.",
+      "timings": {
+        "embed_ms": 24245.58,
+        "search_ms": 440.73,
+        "rerank_ms": 42373.96,
+        "generate_ms": 22936.12
+      }
+    },
+    {
+      "question": "What is the primary purpose of conducting a series of relevant tests on appliances?",
+      "gold_sources": [
+        "is.15750.2006.pdf"
+      ],
+      "retrieved_sources": [
+        "is.15750.2006.pdf",
+        "is.15750.2006.pdf",
+        "is.15750.2006.pdf",
+        "is.15750.2006.pdf",
+        "osha2254.pdf"
+      ],
+      "answer": "The primary purpose of conducting a series of relevant tests on appliances, as outlined in [4] and other sections, is to check compliance with specific requirements and standards. This includes testing for storage temperatures [4], energy consumption [3], water-vapour condensation [2], and high voltage test [1]. These tests aim to ensure the appliance meets specified conditions and regulations.\n\nSafety warning: When conducting these tests, follow proper safety protocols to avoid electrical shock or other hazards. Ensure all necessary precautions are taken as outlined in relevant sections of the provided sources.\n\nNote: The specific purpose of each test is detailed in the respective sections [1] through [4].",
+      "timings": {
+        "embed_ms": 216.79,
+        "search_ms": 590.26,
+        "rerank_ms": 162925.53,
+        "generate_ms": 23067.68
+      }
+    },
+    {
+      "question": "What is the recommended direction for straightening copper tubing used in air conditioners during the first step of copper tube processing?",
+      "gold_sources": [
+        "Trainer Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Technician Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "answer": "To straighten copper tubing, follow these steps:\n\n1. Inspect the tubing for any kinks or bends that could cause damage during the straightening process.\n2. Use a tubing straightener tool to gently guide the tubing into its original shape [1].\n3. Apply even pressure while straightening the tubing to avoid damaging it.\n\nSafety warning: Be careful not to apply excessive force, which can lead to tube damage or injury [2].\n\nWhen selecting a tubing straightener, ensure it is compatible with the type of copper tubing being used and follow the manufacturer's instructions for use [3].",
+      "timings": {
+        "embed_ms": 519.86,
+        "search_ms": 432.88,
+        "rerank_ms": 315216.65,
+        "generate_ms": 29828.77
+      }
+    },
+    {
+      "question": "What is a potential consequence of a refrigeration lubricant having high wax content in a refrigeration system?",
+      "gold_sources": [
+        "Technician Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "hydrocarbon_manual-1999.pdf",
+        "0006_newsTRAC-4th-Edition-March-2025.pdf"
+      ],
+      "answer": "According to [1] and [2], a refrigeration lubricant with low wax content is preferred, as separation of wax from the oil mixture may plug refrigerant control orifices. This implies that a lubricant with high wax content could lead to similar issues.\n\nA potential consequence of a refrigeration lubricant having high wax content in a refrigeration system is plugging of refrigerant control orifices, which can cause system malfunction and reduced efficiency [1][2].\n\nSafety warning: High wax content in refrigeration lubricants may lead to premature wear on system components and potentially cause system failure.",
+      "timings": {
+        "embed_ms": 547.49,
+        "search_ms": 737.0,
+        "rerank_ms": 35180.61,
+        "generate_ms": 31767.19
+      }
+    },
+    {
+      "question": "What are the specific year ranges that determine the star level or star rating of a room air conditioner based on its energy efficiency ratio?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "Based on the provided sources, the specific year ranges that determine the star level or star rating of a room air conditioner based on its energy efficiency ratio are:\n\n- From 12th January 2009 to 31st December 2011 [1]\n- From 1st January 2012 to 31st December 2013 [1]\n- From 1st January 2014 to 31st December 2015 [1]\n- From 1st January 2016 to 31st December 2017 [1][3]\n\nNote that the star rating is also mentioned in source [2], but it only provides a general overview of the labeling program and does not specify the year ranges.",
+      "timings": {
+        "embed_ms": 432.17,
+        "search_ms": 720.51,
+        "rerank_ms": 36847.02,
+        "generate_ms": 28128.33
+      }
+    },
+    null,
+    {
+      "question": "What is the acceptable ozone level for Electronic Air Cleaning systems as per the UL 867 safety standard?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "The acceptable ozone level for Electronic Air Cleaning (EAC) systems as per the UL 867 safety standard is within 50 ppb [1]. This is specified in Section 19.3 of the provided document, which states that EACs must meet the following safety criteria with reference to UL 867 and IS-17570:2021/ ISO 16890:2016 for all air purification modules.\n\nSafety Warning: Ozone levels above 50 ppb can be hazardous to human health and may cause respiratory problems. Ensure proper installation, maintenance, and testing of EAC systems to prevent excessive ozone generation [1].\n\nNote: The provided documents do not contain enough information to answer questions about the specific requirements for Electronic Air Cleaning systems beyond what is specified in Section 19.3.",
+      "timings": {
+        "embed_ms": 9462.78,
+        "search_ms": 335.79,
+        "rerank_ms": 598215.44,
+        "generate_ms": 77776.28
+      }
+    },
+    {
+      "question": "What process occurs to the refrigerant in the first part of the heat exchanger after compression?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "answer": "The provided documents do not contain enough information to answer this precisely, as they describe different components and processes within the vapor compression cycle. However, based on [1] and [2], it appears that the first part of the heat exchanger is where de-superheating occurs, which involves rejecting heat from the high-pressure superheated refrigerant.\n\nSafety warning: When handling refrigerants, ensure proper ventilation to prevent inhalation of refrigerant vapors.",
+      "timings": {
+        "embed_ms": 5658.1,
+        "search_ms": 394.26,
+        "rerank_ms": 43797.23,
+        "generate_ms": 18833.06
+      }
+    },
+    {
+      "question": "What activities are carried out in relation to the implementation of ODS Rules, 2000 and its amendments?",
+      "gold_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "retrieved_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "answer": "According to [1], activities related to the implementation of ODS Rules, 2000 and its amendments include registration, regulation of export/import, issuance of production quota, monitoring, and reporting. Additionally, as per [4] and [5], a comprehensive Management Information System (MIS) has been developed for all activities relating to ODS phaseout, including regulatory framework, project implementation, and monitoring.\n\nSafety warning: When handling refrigerants, always follow proper safety procedures to avoid exposure to ozone-depleting substances. Wear personal protective equipment, including gloves and eye protection, when handling chemicals.\n\nRequired tools: None mentioned in the provided sources.\n\nRegulatory context: ODS (Regulation and Control) Rules, 2000 and its amendments, as per [3].\n\nNote: The provided documents do not contain enough information to answer questions about specific procedures or technical steps for refrigerant handling.",
+      "timings": {
+        "embed_ms": 206.23,
+        "search_ms": 177.39,
+        "rerank_ms": 9621.41,
+        "generate_ms": 28653.36
+      }
+    },
+    {
+      "question": "What are the required characteristics of control input response for precise and responsive control in an HVAC system?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf"
+      ],
+      "answer": "The provided documents do not contain enough information to answer this precisely regarding the specific requirements for control input response, such as sensitivity or loop gain. However, according to [1], Input/output sensors and devices shall be matched to the requirements of the respective connected controller panel for accurate, noise-free signal input/output.\n\nFor precise and responsive control in an HVAC system, it is essential to follow the specifications outlined in [2] and ensure that the minimum controls mentioned are implemented. This includes matching the control input response to the loop gain requirements.\n\nSafety warning: When working with electronic data inputs and outputs, ensure proper grounding and shielding to prevent electrical shock or damage to equipment.\n\nRequired tools: Multimeter, oscilloscope (if necessary for signal analysis).\n\nRegulatory context: Not explicitly mentioned in the provided sources.",
+      "timings": {
+        "embed_ms": 264.9,
+        "search_ms": 501.57,
+        "rerank_ms": 33083.05,
+        "generate_ms": 28681.19
+      }
+    },
+    {
+      "question": "What international standard governs the safety of commercial refrigerating appliances with an incorporated or remote refrigerant unit or compressor?",
+      "gold_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "retrieved_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "ISO-5149-2.pdf",
+        "Trainer Handbook.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "answer": "The provided documents do not contain enough information to answer this precisely. However, based on the sources listed:\n\nIEC 60335-2-89:2018 [11] and IEC 60335-2-89:2010 [12] both relate to household and similar electrical appliances - Safety - Part 2-89: Particular requirements for commercial refrigerating appliances with an incorporated or remote refrigerant unit or compressor.\n\nAdditionally, ISO 5149-2 [3] references IEC 60335-2-89 as a normative reference.",
+      "timings": {
+        "embed_ms": 340.54,
+        "search_ms": 516.03,
+        "rerank_ms": 30151.44,
+        "generate_ms": 23867.28
+      }
+    },
+    {
+      "question": "What is the alternative pressure at which components can be type-approved by testing, as a multiple of the design pressure PS?",
+      "gold_sources": [
+        "ISO-5149-2.pdf"
+      ],
+      "retrieved_sources": [
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "hydrocarbon_manual-1999.pdf"
+      ],
+      "answer": "According to [3], for refrigerants used in the low-temperature part (with or without compressor) of a cascade system, the maximum allowable pressure (PS) shall be determined by the designer. However, when testing is required, the alternative pressure at which components can be type-approved is not explicitly stated.\n\nHowever, we have another source [5] that mentions pressure testing for hydrocarbon systems. It states that testing pressure should be 1.3 times the working pressure as used in R12 or R134a systems.\n\nTherefore, based on this information, the alternative pressure at which components can be type-approved by testing is 1.3 times the design pressure PS [5].\n\n**Safety Warning:** When performing pressure testing, use dry, oxygen-free nitrogen to avoid contamination and ensure safety [5].",
+      "timings": {
+        "embed_ms": 1373.84,
+        "search_ms": 292.1,
+        "rerank_ms": 88370.83,
+        "generate_ms": 29504.39
+      }
+    },
+    {
+      "question": "What type of organizations, aside from ISO member bodies, participate in the work of ISO technical committees?",
+      "gold_sources": [
+        "ISO-5149-2.pdf"
+      ],
+      "retrieved_sources": [
+        "ISO-5149-2.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "According to [1], ISO collaborates closely with the International Electrotechnical Commission (IEC) on all matters of electrotechnical standardization. Additionally, international organizations, governmental and non-governmental, in liaison with ISO, also take part in the work.\n\nSafety warning: When working with refrigerants, ensure proper training and follow established safety protocols to avoid exposure risks [1].\n\nNote: The provided sources do not specifically mention refrigerant handling or HVAC systems, but they provide general information on organizations participating in standardization work.",
+      "timings": {
+        "embed_ms": 5387.75,
+        "search_ms": 350.81,
+        "rerank_ms": 99471.1,
+        "generate_ms": 23687.42
+      }
+    },
+    {
+      "question": "What is the minimum number of RS485 ports required for each Digital Control Processor (DDC) and what type of battery is required to support complete operation of the RAM in the event of a power failure?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "According to Section 18.4.2 [1], each DDC shall have at least 1 RS485 port.\n\nRegarding the battery, as per Section 18.4.3 [1], each DDC shall have Lithium battery to support complete operation of the RAM for up to 30 days in the event of a power failure.\n\nSafety warning: When handling lithium batteries, ensure proper disposal and follow local regulations regarding hazardous waste management.\n\nNote: The provided documents do not contain enough information to answer questions beyond those directly supported by the specified sections.",
+      "timings": {
+        "embed_ms": 4101.37,
+        "search_ms": 547.89,
+        "rerank_ms": 85319.06,
+        "generate_ms": 44806.21
+      }
+    }
+  ]
+}

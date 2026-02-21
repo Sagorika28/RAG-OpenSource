@@ -157,14 +157,27 @@ class QueryPipeline:
     def _rewrite_query(self, query: str) -> str:
         """
         Use LLM to expand a vague user query into a richer search query.
-
-        Uses the fast 8B model for speed (~200ms via Groq).
-        Falls back to original query on any error.
+        Supports both Groq and Ollama based on configuration.
         """
+        cfg = self.config.get("generation", {})
+        provider = cfg.get("provider", "ollama").lower()
+        
+        if provider == "groq":
+            return self._rewrite_query_groq(query)
+        elif provider == "ollama":
+            return self._rewrite_query_ollama(query)
+        
+        return query
+
+    def _rewrite_query_groq(self, query: str) -> str:
+        """Expand query using Groq."""
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             return query
 
+        cfg = self.config.get("retrieval", {})
+        rewrite_model = cfg.get("rewrite_model", "llama-3.1-8b-instant")
+        
         max_retries = 3
         retry_delay = 1.0
         
@@ -172,51 +185,66 @@ class QueryPipeline:
             try:
                 from groq import Groq
                 client = Groq(api_key=api_key)
+                
                 resp = client.chat.completions.create(
                     messages=[
                         {"role": "system", "content": self.REWRITE_PROMPT},
                         {"role": "user", "content": f"Input: {query}\nOutput:"},
                     ],
-                    model="llama-3.1-8b-instant",  # Fast model for rewriting
+                    model=rewrite_model,
                     temperature=0.0,
                     max_tokens=150,
                 )
-                rewritten = resp.choices[0].message.content.strip()
-                
-                # Post-processing to remove common LLM conversational filler
-                cleanup_phrases = [
-                    "The rewritten query is:",
-                    "Rewritten query:",
-                    "Expanded query:",
-                    "Revised query:",
-                    "Output:",
-                    "Here is the expanded query:",
-                    "Here is the rewritten query:",
-                ]
-                for phrase in cleanup_phrases:
-                    if rewritten.lower().startswith(phrase.lower()):
-                        rewritten = rewritten[len(phrase):].strip()
-                
-                # Remove leading/trailing quotes often added by LLMs
-                rewritten = rewritten.strip(' "')
-
-                # Sanity check: if rewrite is too long or empty, use original
-                if not rewritten or len(rewritten) > 500:
-                    logger.warning(f"Query rewrite sanity check failed: '{rewritten}'")
-                    return query
-                return rewritten
+                raw = resp.choices[0].message.content.strip()
+                return self._cleanup_rewrite(raw, query)
             except Exception as e:
-                if "429" in str(e):
-                    if attempt < max_retries - 1:
-                        logger.warning(f"Query rewriter Rate Limit hit. Retrying in {retry_delay}s...")
-                        time.sleep(retry_delay)
-                        retry_delay *= 2
-                        continue
-                    else:
-                        logger.warning("Query rewriter hit max retries for 429. Using original query.")
-                        return query
-                logger.warning(f"Query rewrite failed, using original: {e}")
+                if "429" in str(e) and attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    retry_delay *= 2
+                    continue
+                logger.warning(f"Groq rewrite failed: {e}")
                 return query
+        return query
+
+    def _rewrite_query_ollama(self, query: str) -> str:
+        """Expand query using Ollama."""
+        import requests
+        cfg = self.config.get("generation", {})
+        base_url = cfg.get("base_url", "http://localhost:11434")
+        model = cfg.get("model", "qwen2.5:3b")
+        
+        url = f"{base_url}/api/generate"
+        prompt = f"{self.REWRITE_PROMPT}\n\nInput: {query}\nOutput:"
+        
+        try:
+            resp = requests.post(url, json={
+                "model": model,
+                "prompt": prompt,
+                "stream": False,
+                "options": {"temperature": 0.0, "num_predict": 150}
+            }, timeout=30)
+            resp.raise_for_status()
+            raw = resp.json().get("response", "").strip()
+            return self._cleanup_rewrite(raw, query)
+        except Exception as e:
+            logger.warning(f"Ollama rewrite failed: {e}")
+            return query
+
+    def _cleanup_rewrite(self, rewritten: str, original: str) -> str:
+        """Common cleanup logic for rewritten queries."""
+        cleanup_phrases = [
+            "The rewritten query is:", "Rewritten query:", "Expanded query:",
+            "Revised query:", "Output:", "Here is the expanded query:",
+            "Here is the rewritten query:",
+        ]
+        for phrase in cleanup_phrases:
+            if rewritten.lower().startswith(phrase.lower()):
+                rewritten = rewritten[len(phrase):].strip()
+        
+        rewritten = rewritten.strip(' "')
+        if not rewritten or len(rewritten) > 500:
+            return original
+        return rewritten
 
     # ------------------------------------------------------------------ #
     #  Public API                                                         #

@@ -1,139 +1,177 @@
 """
-src/scripts/generate_synthetic_eval.py — Generate high-quality eval pairs from indexed chunks.
+src/scripts/generate_synthetic_eval.py — Generate high-quality evaluation pairs.
+
+1. Connects to Qdrant (local/standalone).
+2. Samples N random technical chunks.
+3. Uses Groq (DeepSeek or Llama 70B) to generate a question based on each chunk.
+4. Saves to data/eval/questions_robust.jsonl.
 """
 
-import os
-import json
-import random
-import logging
 import argparse
+import json
+import logging
+import os
+import random
+import sys
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from dotenv import load_dotenv
-from groq import Groq
 from qdrant_client import QdrantClient
 
-from src.core.config import load_config
+# Add project root to path
+sys.path.append(str(Path(__file__).parent.parent.parent))
 
-# Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)-7s | %(message)s')
+from src.core.config import load_config
+from src.core.utils import setup_logging
+
 logger = logging.getLogger(__name__)
 
-GEN_PROMPT = """
-You are a senior HVAC/R technician instructor. I will provide you with a technical document chunk about refrigerants, safety, or equipment maintenance.
+SYNTHETIC_PROMPT = """You are a senior HVAC and refrigerant technical trainer.
+Your task is to create a challenging, technical question based on a specific snippet from a technical manual.
 
-Your task is to generate one high-quality, professional question that can be answered strictly by this chunk.
+TECHNICAL SNIPPET:
+\"\"\"{text}\"\"\"
 
-Rules:
-1. The question should sound like something a technician would ask in the field.
-2. The question must be answerable using only the information in the provided text.
-3. Keep the question concise (1 sentence).
-4. Output ONLY the question text. Do not include labels like 'Question:' or conversational filler.
-
-Text Chunk:
-\"\"\"
-{text}
-\"\"\"
+RULES:
+1. The question must be answerable ONLY using the provided snippet.
+2. The question should be technical and realistic (e.g., asking about limits, procedure steps, safety precautions, or tool requirements).
+3. Do NOT mention the snippet or manual in the question (e.g., don't say "According to the text...").
+4. Output ONLY valid JSON in this format:
+{"question": "<question string>", "reasoning": "<concise explanation of why this is a good test of the snippet>"}
 """
 
 def generate_synthetic_questions(
-    config_path: str,
-    output_path: str,
-    num_questions: int = 20,
+    config: Dict[str, Any],
+    num_questions: int = 30,
+    output_path: str = "data/eval/questions_robust.jsonl",
 ):
     load_dotenv()
-    config = load_config(config_path)
+    gen_cfg = config.get("generation", {})
+    provider = gen_cfg.get("provider", "ollama").lower()
     
-    # Initialize Qdrant
-    qdrant_cfg = config.get("qdrant", {})
-    if qdrant_cfg.get("mode") == "local":
-        client = QdrantClient(path=qdrant_cfg.get("path"))
+    # 1. Connect to Qdrant and sample chunks
+    q_cfg = config.get("qdrant", {})
+    mode = q_cfg.get("mode", "local")
+    collection_name = q_cfg.get("collection_name", "rag_os_chunks")
+    
+    if mode == "server":
+        client = QdrantClient(url=q_cfg.get("url", "http://localhost:6333"))
     else:
-        client = QdrantClient(url=qdrant_cfg.get("url"))
+        client = QdrantClient(path=q_cfg.get("path", "./qdrant_data"))
+
+    count = client.count(collection_name=collection_name).count
+    logger.info(f"Found {count} points in collection '{collection_name}'")
     
-    collection_name = qdrant_cfg.get("collection_name", "rag_os_chunks")
-    
-    # Sample chunks
-    logger.info(f"Sampling {num_questions} chunks from collection '{collection_name}'...")
-    
-    # Get total count
-    count = client.count(collection_name).count
     if count == 0:
         logger.error("Collection is empty. Run ingestion first.")
         return
 
-    # Use scroll to get points. Qdrant local doesn't support random sampling easily, 
-    # so we'll scroll with a random offset if count is large, or just take a batch.
-    points, _ = client.scroll(
+    # Sample random offsets
+    sample_size = min(num_questions * 2, count) # Sample extra to account for bad chunks
+    sampled_points = client.scroll(
         collection_name=collection_name,
-        limit=min(100, count),
+        limit=sample_size,
         with_payload=True,
-    )
-    
-    if not points:
-        logger.error("No points found in collection.")
-        return
-        
-    sampled_points = random.sample(points, min(len(points), num_questions))
-    
-    # Initialize Groq
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        logger.error("GROQ_API_KEY is missing.")
-        return
-    groq_client = Groq(api_key=api_key)
-    
-    eval_pairs = []
-    
-    logger.info(f"Generating {len(sampled_points)} synthetic questions via Groq...")
-    
-    for i, point in enumerate(sampled_points):
-        text = point.payload.get("text", "")
-        source = point.payload.get("source", "unknown")
-        
-        if not text:
-            continue
-            
-        try:
-            resp = groq_client.chat.completions.create(
-                messages=[
-                    {"role": "user", "content": GEN_PROMPT.format(text=text[:2000])},
-                ],
-                model="llama-3.1-8b-instant",
-                temperature=0.0,
-                max_tokens=100,
-            )
-            question = resp.choices[0].message.content.strip().strip('"')
-            
-            if question:
-                eval_pairs.append({
-                    "question": question,
-                    "gold_sources": [source],
-                    "metadata": {
-                        "chunk_id": str(point.id),
-                        "type": "synthetic"
-                    }
-                })
-                logger.info(f"[{i+1}/{len(sampled_points)}] Q: {question[:60]}...")
-        except Exception as e:
-            logger.error(f"Failed to generate question for point {point.id}: {e}")
+        with_vectors=False,
+    )[0]
 
-    # Save to JSONL
-    output_file = Path(output_path)
-    output_file.parent.mkdir(parents=True, exist_ok=True)
+    random.shuffle(sampled_points)
     
-    with open(output_file, "w") as f:
-        for pair in eval_pairs:
-            f.write(json.dumps(pair) + "\n")
+    # 2. Setup LLM Client
+    if provider == "groq":
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY not found in environment")
+        from groq import Groq
+        g_client = Groq(api_key=api_key)
+        model = gen_cfg.get("model", "llama-3.3-70b-versatile")
+    else:
+        import requests
+        base_url = gen_cfg.get("base_url", "http://localhost:11434")
+        model = gen_cfg.get("model", "llama3.1:8b")
+        logger.info(f"Using local Ollama at {base_url} with {model}")
+
+    results = []
+    logger.info(f"Generating {num_questions} synthetic questions using {model}...")
+
+    def _extract_json(text: str) -> Dict[str, Any]:
+        """Manually extract JSON from a potentially conversational response."""
+        try:
+            start = text.find("{")
+            end = text.rfind("}")
+            if start != -1 and end != -1:
+                return json.loads(text[start:end+1])
+            return json.loads(text)
+        except Exception:
+            raise ValueError(f"Could not parse JSON from: {text[:100]}...")
+
+    for i, point in enumerate(sampled_points):
+        if len(results) >= num_questions:
+            break
+
+        payload = point.payload
+        text = payload.get("text", "")
+        source = payload.get("source", "unknown")
+        
+        if len(text) < 200: # Skip very small chunks
+            continue
+
+        try:
+            if provider == "groq":
+                resp = g_client.chat.completions.create(
+                    messages=[{"role": "system", "content": SYNTHETIC_PROMPT.replace("{text}", text)}],
+                    model=model,
+                    temperature=0.1,
+                    max_tokens=300,
+                )
+                raw_content = resp.choices[0].message.content
+            else:
+                prompt = SYNTHETIC_PROMPT.replace("{text}", text)
+                resp = requests.post(f"{base_url}/api/generate", json={
+                    "model": model,
+                    "prompt": prompt,
+                    "stream": False,
+                    "format": "json",
+                    "options": {"temperature": 0.1, "num_predict": 300}
+                }, timeout=120)
+                resp.raise_for_status()
+                raw_content = resp.json().get("response", "")
+
+            data = _extract_json(raw_content)
             
-    logger.info(f"Successfully saved {len(eval_pairs)} eval pairs to {output_path}")
+            if "question" not in data:
+                raise KeyError("Missing 'question' key in JSON")
+
+            results.append({
+                "question": data["question"],
+                "gold_sources": [source],
+                "metadata": {
+                    "source_chunk": text[:100] + "...",
+                    "reasoning": data.get("reasoning", "")
+                }
+            })
+            logger.info(f"[{len(results)}/{num_questions}] Generated for {source}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to generate for chunk {i}: {e}")
+
+    # 3. Save to JSONL
+    out_file = Path(output_path)
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    with open(out_file, "w") as f:
+        for res in results:
+            f.write(json.dumps(res) + "\n")
+
+    logger.info(f"Successfully saved {len(results)} questions to {output_path}")
 
 if __name__ == "__main__":
+    setup_logging()
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/groq.yaml")
-    parser.add_argument("--output", default="data/eval/questions_robust.jsonl")
-    parser.add_argument("--num", type=int, default=20)
+    parser.add_argument("--config", "-c", default="configs/groq.yaml")
+    parser.add_argument("--num", "-n", type=int, default=30)
     args = parser.parse_args()
-    
-    generate_synthetic_questions(args.config, args.output, args.num)
+
+    config = load_config(args.config)
+    generate_synthetic_questions(config, num_questions=args.num)

@@ -64,20 +64,28 @@ Respond ONLY with valid JSON in this exact format (no extra text, no markdown):
 
 class LLMJudge:
     """
-    Evaluates generated answers using an LLM (Groq API).
+    Evaluates generated answers using an LLM (Groq or Ollama).
     """
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.api_key = os.getenv("GROQ_API_KEY")
-        if not self.api_key:
-            logger.warning("GROQ_API_KEY not found — LLM Judge will be disabled")
+        self.config = config or {}
+        self.provider = self.config.get("provider", "groq")
+        self.model = self.config.get("judge_model", "llama-3.1-8b-instant")
+        
+        if self.provider == "groq":
+            self.api_key = os.getenv("GROQ_API_KEY")
+            if not self.api_key:
+                logger.warning("GROQ_API_KEY not found — LLM Judge will be disabled or fallback to Ollama if configured")
+                self.client = None
+            else:
+                from groq import Groq
+                self.client = Groq(api_key=self.api_key)
+        elif self.provider == "ollama":
+            self.base_url = self.config.get("base_url", "http://localhost:11434")
+            self.client = "ollama" # Placeholder to indicate availability
+        else:
+            logger.error(f"Unsupported judge provider: {self.provider}")
             self.client = None
-            return
-
-        from groq import Groq
-        self.client = Groq(api_key=self.api_key)
-        # Use a fast model for judging (cost-effective)
-        self.model = (config or {}).get("judge_model", "llama-3.1-8b-instant")
 
     def evaluate(
         self,
@@ -103,6 +111,15 @@ class LLMJudge:
             f"ANSWER:\n{answer}"
         )
 
+        if self.provider == "groq":
+            return self._evaluate_groq(user_content)
+        elif self.provider == "ollama":
+            return self._evaluate_ollama(user_content)
+        
+        return self._empty_scores()
+
+    def _evaluate_groq(self, user_content: str) -> Dict[str, Any]:
+        """Call Groq API for evaluation."""
         max_retries = 3
         retry_delay = 1.0
         
@@ -132,10 +149,39 @@ class LLMJudge:
                     else:
                         return self._empty_scores(justification="⚠️ Rate limit reached")
                 
-                logger.error(f"LLM Judge failed: {e}")
-                return self._empty_scores(justification=f"❌ Error: {str(e)[:50]}")
+                logger.error(f"LLM Judge (Groq) failed: {e}")
+                return self._empty_scores(justification=f"❌ Groq Error: {str(e)[:50]}")
         
         return self._empty_scores(justification="⚠️ Request timed out")
+
+    def _evaluate_ollama(self, user_content: str) -> Dict[str, Any]:
+        """Call Ollama API for evaluation."""
+        import requests
+        url = f"{self.base_url}/api/generate"
+        
+        # Build a single prompt for Ollama/generate
+        full_prompt = f"{JUDGE_PROMPT}\n\n{user_content}\n\nJSON Response:"
+        
+        payload = {
+            "model": self.model,
+            "prompt": full_prompt,
+            "stream": False,
+            "format": "json", # Ollama 0.1.13+ supports JSON mode
+            "options": {
+                "temperature": 0.0,
+                "num_predict": 256,
+            },
+        }
+
+        try:
+            resp = requests.post(url, json=payload, timeout=300)
+            resp.raise_for_status()
+            data = resp.json()
+            raw = data.get("response", "").strip()
+            return self._parse_scores(raw)
+        except Exception as e:
+            logger.error(f"LLM Judge (Ollama) failed: {e}")
+            return self._empty_scores(justification=f"❌ Ollama Error: {str(e)[:50]}")
 
     def evaluate_batch(
         self,

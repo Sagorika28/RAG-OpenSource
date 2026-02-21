@@ -35,11 +35,13 @@ retrieval:
   top_p: 0.9
   dedup_threshold: 0.9             # Jaccard similarity threshold (0.9 = 90% word overlap → duplicate)
   query_rewrite: true              # LLM expands vague queries before search
+  rewrite_model: llama-3.1-8b-instant  # Faster model for quick expansion
 
 generation:
   enabled: true
   provider: groq
-  model: llama-3.1-8b-instant  # High token quota for stability
+  model: llama-3.3-70b-versatile  # High token quota for stability
+  judge_model: deepseek-r1-distill-qwen-32b # Smarter Judge (DeepSeek R1) for evals
   temperature: 0.1
   max_tokens: 1024
   system_prompt: |

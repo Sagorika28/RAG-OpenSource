@@ -1,0 +1,773 @@
+{
+  "config_file": "data/eval/questions_robust.jsonl",
+  "num_queries": 30,
+  "k_values": [
+    1,
+    3,
+    5,
+    10
+  ],
+  "retrieval_metrics": {
+    "recall@1": 0.7,
+    "mrr@1": 0.7,
+    "ndcg@1": 0.7,
+    "recall@3": 0.9333,
+    "mrr@3": 0.8056,
+    "ndcg@3": 0.8385,
+    "recall@5": 0.9333,
+    "mrr@5": 0.8056,
+    "ndcg@5": 0.8385,
+    "recall@10": 0.9667,
+    "mrr@10": 0.8111,
+    "ndcg@10": 0.8504
+  },
+  "generation_metrics": {
+    "faithfulness": 0.0,
+    "relevance": 0.0,
+    "completeness": 0.0,
+    "overall": 0.0
+  },
+  "latency_summary": {
+    "embed_ms": {
+      "mean": 251.46,
+      "p50": 36.04,
+      "p95": 77.01,
+      "min": 31.46,
+      "max": 6243.84
+    },
+    "generate_ms": {
+      "mean": 4463.55,
+      "p50": 6187.21,
+      "p95": 10494.86,
+      "min": 802.8,
+      "max": 14410.04
+    },
+    "rerank_ms": {
+      "mean": 6180.03,
+      "p50": 6630.28,
+      "p95": 7629.85,
+      "min": 2728.37,
+      "max": 8571.04
+    },
+    "search_ms": {
+      "mean": 7.91,
+      "p50": 6.72,
+      "p95": 14.76,
+      "min": 5.88,
+      "max": 15.15
+    }
+  },
+  "index_stats": {
+    "collection": "rag_os_chunks",
+    "points_count": 9000,
+    "status": "green",
+    "vector_size": 384
+  },
+  "per_query_results": [
+    {
+      "question": "What happens to the Dew Clean operation in the event of a main power reset or power failure?",
+      "gold_sources": [
+        "JTKJ50.pdf"
+      ],
+      "retrieved_sources": [
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf",
+        "JTKJ50.pdf"
+      ],
+      "answer": "In the event of a main power reset or power failure, the Dew Clean operation will come to an end [1]. This means that the operation will automatically stop and will not resume until power is restored and the operation is manually restarted [1]. It is also noted that if the user removes and reinserts the battery while using the Dew Clean function, the Dew Clean feature is turned OFF on the remote [5]. Additionally, the function will not operate if the room temperature is lower than 10\u00b0C [5]. To restart the Dew Clean operation, the user must follow the normal startup procedure [7]. Safety precautions should be taken, and it is recommended that users avoid staying inside the room during the Dew Clean operation, as the indoor temperature will be lower [5]. The Dew Clean operation can be canceled by pressing, holding, and releasing the specified button for a duration between 2 to 9 seconds, or alternatively, using the \"On/Off\" button [6].",
+      "timings": {
+        "embed_ms": 6243.84,
+        "search_ms": 14.76,
+        "rerank_ms": 8571.04,
+        "generate_ms": 1026.39
+      }
+    },
+    {
+      "question": "What are the steps to diagnose reasons for improper cooling in an air conditioner, and what are some possible causes of this issue?",
+      "gold_sources": [
+        "0046_MC_Sr. Technician RACW Refrigeration Air Conditioning & Washing   Machine_V4.pdf"
+      ],
+      "retrieved_sources": [
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "MS-Q18YNZA.pdf",
+        "lloyd-AC-common.pdf",
+        "AR50F19D1ZHNNA.pdf",
+        "MS-Q18YNZA.pdf",
+        "0006_newsTRAC-4th-Edition-March-2025.pdf",
+        "AR50F19D1ZHNNA.pdf"
+      ],
+      "answer": "To diagnose improper cooling in an air conditioner, first check if the unit is receiving power and if the circuit breaker has tripped [5]. Then, ensure the air filter is clean, as a dirty filter can decrease cooling performance [3][5]. Check if the set temperature is lower than the current temperature, and if the outdoor unit is covered or installed near obstacles [5]. Verify if doors or windows are open, as this can cause poor circulation or performance [5]. Also, check the pipe length between the units to ensure it does not exceed the maximum pipe length [5]. Possible causes of improper cooling include incorrect airflow, insufficient cooling capacity, and refrigerant leakage [1][2][4]. Additionally, check for any blockages in the air inlet and outlet, and ensure the unit is installed firmly and the refrigerant leakage test has been performed [4]. If the issue persists, consult the troubleshooting guide and contact a service provider if necessary [5][6].",
+      "timings": {
+        "embed_ms": 72.29,
+        "search_ms": 15.15,
+        "rerank_ms": 7456.54,
+        "generate_ms": 1439.42
+      }
+    },
+    {
+      "question": "What is the maximum high-side pressure observed in the split AC tests?",
+      "gold_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "retrieved_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "ISO-5149-2.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "answer": "The provided documents do not contain enough information to answer this precisely. However, the pressure range of the pressure transducers used for measurement of refrigerant pressure on the high- and low-sides of the vapor compression cycles is 0 - 500 psia [7]. The high-side pressure decay is shown in several figures, including Figure 20, Figure 21, and Figure 22 [1][2], but the maximum high-side pressure is not explicitly stated.",
+      "timings": {
+        "embed_ms": 54.61,
+        "search_ms": 6.72,
+        "rerank_ms": 7136.1,
+        "generate_ms": 802.8
+      }
+    },
+    {
+      "question": "What factors must be considered when determining the size of power cables for an HVAC system?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "Trainer Handbook.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "When determining the size of power cables for an HVAC system, consideration must be given to the load, the length of cabling, and the type of load [2]. The power cables shall be of sizes as indicated in the tender specifications, and in all other cases, the sizes shall be as approved by the Engineer-in-Charge [2]. The cables shall be XLPE insulated, PVC FRLS inner & outer sheathed, with copper conductors up to 16 sq mm and copper/aluminium conductors above 16 sq mm [4]. The number and size of the control cables shall be such as to suit the control system design adopted by the Air-conditioning Contractor [8]. Additionally, the capacity of switch gear, starters, etc. shall be suitable for the requirements of loads fed/controlled, with starting currents duly considered in case of motor loads [9].",
+      "timings": {
+        "embed_ms": 51.42,
+        "search_ms": 6.29,
+        "rerank_ms": 6692.94,
+        "generate_ms": 937.62
+      }
+    },
+    {
+      "question": "What is a critical requirement for technicians handling R-290 and HFC-32 refrigerants?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "Technicians handling R-290 and HFC-32 refrigerants must be well trained [4]. They should have knowledge of regulations and standards relating to flammable refrigerants [1][2]. It is also crucial for technicians to follow good service practices, considering safety, and always use Personal Protective Equipment (PPE) [4]. This is because R-290 is highly flammable and HFC-32 is mildly flammable [1][2]. Proper training and safety precautions are essential to handle these refrigerants safely and efficiently [4]. The technician should also be aware of the properties of the refrigerants, such as the high pressure of HFC-32 and the low pressure of R-290 [1][2]. Additionally, technicians should be aware of the risks of undercharging and overcharging, which can reduce system performance and efficiency, and even lead to a refrigerant circuit burst [5].",
+      "timings": {
+        "embed_ms": 58.66,
+        "search_ms": 6.34,
+        "rerank_ms": 4349.12,
+        "generate_ms": 951.38
+      }
+    },
+    {
+      "question": "What regulator pressure range is recommended for passing Nitrogen through a tube to prevent oxide formation during brazing?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Handbook-for-Flammable-Refrigerants-RAC-Technicians-06.11.19.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "To prevent oxide formation on the inside of the tubes during brazing, it is recommended to slowly pass Nitrogen through the tube [1]. The regulator pressure for passing Nitrogen should be about 0.5 bar to 1 bar [1]. Additionally, it is essential to braze in a well-ventilated area and not with flammable refrigerant in or around the system [2][3]. Introduction of Nitrogen as a protective gas with a very low flow rate inside the tube assembly during the brazing process is a good method to avoid oxidation [5]. The flow rate should be about 1 to 2 liters per minute [6]. It is crucial to follow safety precautions, such as wearing safety shoes and protecting service valves with wet rags or heat sink material [5].",
+      "timings": {
+        "embed_ms": 54.71,
+        "search_ms": 6.17,
+        "rerank_ms": 5676.46,
+        "generate_ms": 913.1
+      }
+    },
+    {
+      "question": "What is the mathematical formula to calculate pressure, and what are the units of measurement for the force applied in this calculation?",
+      "gold_sources": [
+        "Trainer Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "The mathematical formula to calculate pressure is p = F/A, where p is the pressure, F is the force, and A is the area [1][2]. The force (F) is calculated as mass * acceleration (m*a) and is measured in units such as Newton (N) [1][2]. The unit of pressure is denoted as N/m^2, also known as Pascal (Pa) [2][3]. Additionally, other units of pressure include kgf/cm^2 and lbf/in^2 (psi) [1][2]. The force is proportional to mass 'm' and acceleration 'a' [1]. The calculation of pressure is crucial in ensuring that refrigeration systems operate at design pressure [3].",
+      "timings": {
+        "embed_ms": 56.25,
+        "search_ms": 5.97,
+        "rerank_ms": 6528.91,
+        "generate_ms": 907.35
+      }
+    },
+    {
+      "question": "What are the two common types of variable restriction controls that have changing opening areas of flow depending on the type of control?",
+      "gold_sources": [
+        "Trainer Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "HVAC_Specification_2024.pdf",
+        "Trainer Handbook.pdf",
+        "HVAC_Specification_2024.pdf",
+        "Technician Handbook.pdf"
+      ],
+      "answer": "The two common types of variable restriction controls that have changing opening areas of flow depending on the type of control are the Automatic Expansion Valve (Pressure Control) [1][2] and the Thermostatic Expansion Valve [1][2]. These types of expansion devices are classified as variable-restriction type [3][4]. They regulate the flow of refrigerant as per the load on the evaporator [4]. Additionally, variable orifice or electronic expansion valves can also be used for refrigerant flow control [5]. It is essential to note that these devices offer resistance to flow, resulting in a pressure drop [4].",
+      "timings": {
+        "embed_ms": 33.27,
+        "search_ms": 5.94,
+        "rerank_ms": 6599.39,
+        "generate_ms": 833.05
+      }
+    },
+    {
+      "question": "What is required to manage OPC objects or BACnet stations that do not support any calendar or scheduler objects?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "A higher-level schedule within the management software is required to manage OPC objects or BACnet stations that do not support any calendar or scheduler objects [1]. This higher-level schedule is used in addition to the BACnet schedule and calendar objects [1]. The management software must be able to read, change, and then write to the BACnet stations again [1]. The BACnet scope of functions shall comprise the BACnet B-BC profile (BACnet Building Controller) [2]. The automation station shall support communication via the standardized BACnet/IP communication protocol [2]. Time and calendar functionalities shall be implemented according to the BACnet standard as Schedule and Calendar objects [2]. The software must enable the scanning of the different OPC UA or DA servers in order to import the data points quickly [3]. An OPC UA client driver must be available [3].",
+      "timings": {
+        "embed_ms": 35.59,
+        "search_ms": 6.77,
+        "rerank_ms": 7129.01,
+        "generate_ms": 934.98
+      }
+    },
+    {
+      "question": "What are the key characteristics of a trainer's attitude, mood, and voice when delivering a training session?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf"
+      ],
+      "answer": "A trainer's attitude should be modest, not arrogant or nervous [4]. The mood should be cheerful, rather than depressed [1][4]. The voice delivery should be firm, reflecting confidence in the subject matter [1][4]. Additionally, the trainer should display a positive body language that supports verbal communication [1][4]. Humor can be used to make the training interesting, but it should not become the primary focus [1][4]. A logical and well-structured approach to training delivery is also essential [1][4]. The trainer should strive to be clear, concrete, concise, and consistent in their speaking [5]. By adopting these characteristics, a trainer can create an effective and engaging training environment [1][3]. Safety precautions and regulatory context are not directly applicable in this scenario, as the sources focus on training delivery and presentation skills [1][2][3][4][5].",
+      "timings": {
+        "embed_ms": 62.76,
+        "search_ms": 7.04,
+        "rerank_ms": 4015.1,
+        "generate_ms": 948.14
+      }
+    },
+    {
+      "question": "What types of materials can be degraded by UV-B radiation, and what could be the potential economic impact of mitigating this degradation?",
+      "gold_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "retrieved_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "Technician Handbook.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "answer": "Materials that can be degraded by UV-B radiation include wood, plastic, rubber, fabrics, and many construction materials [1][2][3][5]. The economic impact of replacing and/or protecting these materials could be significant [1]. UV-B radiation can cause discoloration, loss of mechanical integrity, and other forms of damage to these materials [2][3]. The value of this damage could go into billions of US dollars [2]. Typical damages range from discoloration to loss of mechanical integrity [2][3]. Paints, rubber, wood, and plastic are especially vulnerable to degradation, particularly in tropical regions [2]. The Montreal Protocol has contributed to mitigating this degradation by protecting the stratospheric ozone layer and reducing UV-B radiation [4].",
+      "timings": {
+        "embed_ms": 34.45,
+        "search_ms": 6.96,
+        "rerank_ms": 5824.59,
+        "generate_ms": 934.88
+      }
+    },
+    {
+      "question": "What are the key components that a hazardous materials technician should review and demonstrate competency in, as per 29 CFR 1910.120(q), to ensure effective response to hazardous substance releases?",
+      "gold_sources": [
+        "osha2254.pdf"
+      ],
+      "retrieved_sources": [
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf"
+      ],
+      "answer": "A hazardous materials technician should review and demonstrate competency in the applicable skills of 29 CFR 1910.120(q) [1][2][4][8], which includes implementing the employer's emergency response plan, classification and identification of hazardous substances, use of specialized personal protective equipment, hazard and risk assessment techniques, and decontamination procedures [8]. They should also know how to perform basic control, containment, and/or confinement operations, and implement basic decontamination procedures [8]. Additionally, they should understand the principles and practices for analyzing an incident, identifying hazardous substance transportation containers, and selecting the appropriate strategy for approaching release sites [1][9]. Hands-on experience with retrieval and use of written and electronic information relative to response decision making is also essential [1][2][9]. Familiarization with OSHA standard 29 CFR 1910.1201 and the U.S. Department of Transportation's Emergency Response Guidebook (ERG) is also required [1][2][4].",
+      "timings": {
+        "embed_ms": 60.39,
+        "search_ms": 6.11,
+        "rerank_ms": 7265.09,
+        "generate_ms": 10494.86
+      }
+    },
+    {
+      "question": "What are the key principles that personnel in the construction industry should adopt for building construction to achieve thermal comfort and environmental protection?",
+      "gold_sources": [
+        "0028_5-Booklet-for-sensitizing-building-community.pdf"
+      ],
+      "retrieved_sources": [
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "Ref. _ Air Conditioning Tech._CTS2.0_NSQF-4.pdf",
+        "0028_5-Booklet-for-sensitizing-building-community.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "The key principles that personnel in the construction industry should adopt for building construction to achieve thermal comfort and environmental protection include incorporating passive cooling design, using non-ODS and low-GWP technologies, and promoting energy-efficient building designs [1][2]. This can be achieved by adopting principles of passive cooling, non-ODS, low GWP, and energy-efficient technologies in building construction [1]. The construction industry should focus on creating buildings that are designed and constructed to maximize natural cooling or heating conditions, using materials that are conducive to natural cooling [3]. Additionally, the industry should promote awareness and understanding of passive cooling principles and devices, as well as energy-efficient building codes [2]. The use of evaporative cooling units, proper siting and orientation of buildings, and consideration of comfort levels required are also important design considerations [10]. By adopting these principles, the construction industry can play a crucial role in reducing energy consumption and environmental impact [9]. Overall, a balanced approach of both passive cooling and active cooling strategies, as well as optimization of cooling loads, is necessary for sustainable cooling in buildings [5].",
+      "timings": {
+        "embed_ms": 35.0,
+        "search_ms": 7.66,
+        "rerank_ms": 7629.85,
+        "generate_ms": 14410.04
+      }
+    },
+    {
+      "question": "What tools are required for the repair and maintenance of a split air-conditioner charged with R-290 or HFC-32?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "answer": "To repair and maintain a split air-conditioner charged with R-290 or HFC-32, the required tools include a long hose for venting of refrigerant, evacuation and charging unit, R-290 leak detector, filter/drier, nitrogen cylinder, soap solution, pliers, and brazing torch [1]. Additionally, pressure gauges and temperature measuring devices are necessary [1]. It is also important to note that when handling these refrigerants, especially R-290 which is highly flammable, and HFC-32 which is mildly flammable, technicians should be aware of the safety precautions and regulations [2][3]. The technician should have knowledge of regulation and standards relating to flammable refrigerant [3]. A split air-conditioner charged with these refrigerants should be labeled with a flammable sign when charging is completed [2].",
+      "timings": {
+        "embed_ms": 58.76,
+        "search_ms": 6.28,
+        "rerank_ms": 2765.0,
+        "generate_ms": 2895.7
+      }
+    },
+    {
+      "question": "What are the key issues of negotiation in the Montreal Protocol Meetings that relate to implementation and enforcement?",
+      "gold_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "retrieved_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0016_8-Study-on-Public-Procurement-Policies-Hiring-Trained-and-certified-technicians.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0016_8-Study-on-Public-Procurement-Policies-Hiring-Trained-and-certified-technicians.pdf"
+      ],
+      "answer": "The key issues of negotiation in the Montreal Protocol Meetings that relate to implementation and enforcement include combatting illegal trade, HFC-23 by-product emissions, and issues relating to the implementation and enforcement of the Montreal Protocol [1]. Additionally, the negotiations also cover replenishment of the multilateral fund [1]. The Ex-Com meetings also discuss approval of cost funding guidelines for HFC phasedown in Article 5 countries, funding window for pilot projects to maintain and/or enhance energy efficiency of replacement technologies and equipment, and enhanced funding for institutional strengthening projects [3]. These issues are crucial for the effective implementation and enforcement of the Montreal Protocol. The negotiations aim to ensure the protection of the stratospheric ozone layer and mitigate climate change [2]. The Montreal Protocol has made significant contributions to environmental sustainability and human health, and its implementation is critical for achieving the United Nations' Sustainable Development Goals [2]. The negotiations also focus on promoting energy efficiency measures and transitioning to low GWP alternatives during the phase-down of Hydrofluorocarbons (HFCs) [5].",
+      "timings": {
+        "embed_ms": 32.88,
+        "search_ms": 6.03,
+        "rerank_ms": 5523.25,
+        "generate_ms": 9302.2
+      }
+    },
+    {
+      "question": "What are some necessary administrative costs that should be included in an agency's occupational safety and health program resources?",
+      "gold_sources": [
+        "osha2254.pdf"
+      ],
+      "retrieved_sources": [
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "small-business.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "osha2254.pdf",
+        "small-business.pdf",
+        "osha2254.pdf"
+      ],
+      "answer": "According to [1], necessary administrative costs for an agency's occupational safety and health program resources include training, travel, and personal protective equipment. These costs are essential to implement and administer the program at all levels [1]. Additionally, the program should include sufficient personnel to carry out these functions [1]. The agency should also provide occupational safety and health training for supervisory employees and safety and health specialists [3][4]. The training programs should address various topics, including hazard identification, control measures, and personal protective equipment [6]. Annual refresher training is also required [6].",
+      "timings": {
+        "embed_ms": 77.01,
+        "search_ms": 11.33,
+        "rerank_ms": 7252.57,
+        "generate_ms": 5071.69
+      }
+    },
+    {
+      "question": "Where can details on instrumentation and the data acquisition and control system be found?",
+      "gold_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "retrieved_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "breakout_refrigeran_managemen_leak_checking_101.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "Details on instrumentation and the data acquisition and control system can be found in APPENDIX A [1]. This appendix provides information on the measurement range, accuracy, precision, and other specifications of the instrumentation used in the test setup [1]. Additionally, the data acquisition hardware and software used are described in Sections General sensors and controls [3][4][5], which include details on the National Instruments hardware and LabVIEW software used for data acquisition and control.",
+      "timings": {
+        "embed_ms": 31.81,
+        "search_ms": 12.81,
+        "rerank_ms": 7245.48,
+        "generate_ms": 3906.86
+      }
+    },
+    {
+      "question": "What is the primary purpose of conducting a series of relevant tests on appliances?",
+      "gold_sources": [
+        "is.15750.2006.pdf"
+      ],
+      "retrieved_sources": [
+        "is.15750.2006.pdf",
+        "ISO-5149-2.pdf",
+        "is.15750.2006.pdf",
+        "is.15750.2006.pdf",
+        "is.15750.2006.pdf",
+        "is.15750.2006.pdf",
+        "osha2254.pdf",
+        "0006_newsTRAC-4th-Edition-March-2025.pdf",
+        "is.15750.2006.pdf",
+        "is.15750.2006.pdf"
+      ],
+      "answer": "The primary purpose of conducting a series of relevant tests on appliances is to check their performance in use [4]. This is done to ensure that the appliances are constructed in such a manner as to ensure adequate performance and durability [4]. The tests are applied to check the energy consumption, air tightness, and other characteristics of the appliances [1][3]. The purpose is to determine if the appliances meet the specified requirements and to identify any potential issues [4]. The tests include checking the opening force of doors or lids, testing for absence of odour and taste, and other relevant tests [5][6]. The tests are crucial to ensure that the appliances are safe and functional [7]. By conducting these tests, manufacturers can ensure that their appliances meet the required standards [2]. The tests help to identify any defects or issues, which can be addressed before the appliances are released to the market [8].",
+      "timings": {
+        "embed_ms": 41.41,
+        "search_ms": 7.88,
+        "rerank_ms": 6954.28,
+        "generate_ms": 2157.12
+      }
+    },
+    {
+      "question": "What is the recommended direction for straightening copper tubing used in air conditioners during the first step of copper tube processing?",
+      "gold_sources": [
+        "Trainer Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 36.04,
+        "search_ms": 8.6,
+        "rerank_ms": 6310.95,
+        "generate_ms": 6232.82
+      }
+    },
+    {
+      "question": "What is a potential consequence of a refrigeration lubricant having high wax content in a refrigeration system?",
+      "gold_sources": [
+        "Technician Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Technician Handbook.pdf",
+        "hydrocarbon_manual-1999.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "OSHA3836.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 33.67,
+        "search_ms": 6.29,
+        "rerank_ms": 7116.47,
+        "generate_ms": 6208.59
+      }
+    },
+    {
+      "question": "What are the specific year ranges that determine the star level or star rating of a room air conditioner based on its energy efficiency ratio?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Technician Handbook.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 34.46,
+        "search_ms": 6.32,
+        "rerank_ms": 7312.18,
+        "generate_ms": 6234.73
+      }
+    },
+    {
+      "question": "What type of refrigerant was used to charge the split AC unit during the shakedown test?",
+      "gold_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "retrieved_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 32.53,
+        "search_ms": 5.92,
+        "rerank_ms": 6717.92,
+        "generate_ms": 6358.65
+      }
+    },
+    {
+      "question": "What is the acceptable ozone level for Electronic Air Cleaning systems as per the UL 867 safety standard?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "ISO-5149-2.pdf",
+        "HVAC_Specification_2024.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "osha2254.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 34.99,
+        "search_ms": 8.29,
+        "rerank_ms": 7604.76,
+        "generate_ms": 6339.76
+      }
+    },
+    {
+      "question": "What process occurs to the refrigerant in the first part of the heat exchanger after compression?",
+      "gold_sources": [
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf"
+      ],
+      "retrieved_sources": [
+        "Trainer Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Good_Service_Practices_and_Installation_of_ACs_Trainer_Handbook.pdf",
+        "Technician Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "is.15750.2006.pdf",
+        "is.15750.2006.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 31.46,
+        "search_ms": 6.89,
+        "rerank_ms": 5151.43,
+        "generate_ms": 6251.41
+      }
+    },
+    {
+      "question": "What activities are carried out in relation to the implementation of ODS Rules, 2000 and its amendments?",
+      "gold_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "retrieved_sources": [
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf",
+        "0002_27th-edition-of-The-Montreal-Protocol-India\u2019s-Success-Story-2025.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 32.15,
+        "search_ms": 5.92,
+        "rerank_ms": 2728.37,
+        "generate_ms": 6245.09
+      }
+    },
+    {
+      "question": "What are the required characteristics of control input response for precise and responsive control in an HVAC system?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 31.61,
+        "search_ms": 6.16,
+        "rerank_ms": 6036.92,
+        "generate_ms": 6187.21
+      }
+    },
+    {
+      "question": "What international standard governs the safety of commercial refrigerating appliances with an incorporated or remote refrigerant unit or compressor?",
+      "gold_sources": [
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf"
+      ],
+      "retrieved_sources": [
+        "ISO-5149-2.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "Experimental Evaluation of Refrigerant Leak Characteristics for Different HVAC&R Equipment Types.pdf",
+        "is.15750.2006.pdf",
+        "AHR EXPO Session on A2s and A3s_Combined slides.pdf",
+        "ISO-5149-2.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 34.17,
+        "search_ms": 11.64,
+        "rerank_ms": 4213.81,
+        "generate_ms": 6199.1
+      }
+    },
+    {
+      "question": "What is the alternative pressure at which components can be type-approved by testing, as a multiple of the design pressure PS?",
+      "gold_sources": [
+        "ISO-5149-2.pdf"
+      ],
+      "retrieved_sources": [
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf",
+        "ISO-5149-2.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 55.74,
+        "search_ms": 5.88,
+        "rerank_ms": 6630.28,
+        "generate_ms": 6249.2
+      }
+    },
+    {
+      "question": "What type of organizations, aside from ISO member bodies, participate in the work of ISO technical committees?",
+      "gold_sources": [
+        "ISO-5149-2.pdf"
+      ],
+      "retrieved_sources": [
+        "ISO-5149-2.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "Trainer Handbook.pdf",
+        "osha2254.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 35.2,
+        "search_ms": 12.97,
+        "rerank_ms": 5980.78,
+        "generate_ms": 6278.8
+      }
+    },
+    {
+      "question": "What is the minimum number of RS485 ports required for each Digital Control Processor (DDC) and what type of battery is required to support complete operation of the RAM in the event of a power failure?",
+      "gold_sources": [
+        "HVAC_Specification_2024.pdf"
+      ],
+      "retrieved_sources": [
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "JTKJ50.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf",
+        "HVAC_Specification_2024.pdf"
+      ],
+      "answer": "\u26a0\ufe0f **Groq Rate Limit Reached.** You've hit the daily token limit for your account (likely 100k tokens/day). Please try again later or switch to a high-quota model like `llama-3.1-8b-instant` in your config.",
+      "timings": {
+        "embed_ms": 56.78,
+        "search_ms": 6.29,
+        "rerank_ms": 4982.33,
+        "generate_ms": 6253.66
+      }
+    }
+  ]
+}

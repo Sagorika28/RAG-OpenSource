@@ -142,7 +142,7 @@ class OllamaGenerator(BaseGenerator):
         }
 
         logger.debug(f"Calling Ollama: model={self.model}")
-        resp = requests.post(url, json=payload, timeout=120)
+        resp = requests.post(url, json=payload, timeout=300)
         resp.raise_for_status()
 
         data = resp.json()

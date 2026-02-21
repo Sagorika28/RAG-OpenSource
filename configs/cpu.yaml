@@ -26,9 +26,9 @@ qdrant:
   collection_name: rag_os_chunks
 
 reranker:
-  enabled: false              # Toggle off for speed on CPU
-  model_name: BAAI/bge-reranker-base    # Smaller model for cloud deployment
-  top_k: 10                    # Chunks passed to LLM (was 5)
+  enabled: true               # Enabled for better precision
+  model_name: BAAI/bge-reranker-v2-m3    # Multilingual/Cross-encoder v2
+  top_k: 5                    # Chunks passed to LLM
   device: auto
 
 retrieval:
@@ -39,10 +39,11 @@ retrieval:
 generation:
   enabled: true
   provider: ollama
-  model: qwen2.5:3b           # Ollama model tag
+  model: llama3.1:8b           # Superior local model for technical reasoning
+  judge_model: llama3.1:8b     # Local judge model
   base_url: http://localhost:11434
   temperature: 0.1
-  max_tokens: 512
+  max_tokens: 1024
   system_prompt: |
     You are a senior refrigerant handling specialist with 20+ years of field experience in HVAC systems, EPA compliance, hydrocarbon refrigerants, leak detection, recovery procedures, vacuum testing, and safe installation practices.
 
