@@ -275,9 +275,11 @@ class QueryPipeline:
             QueryResult with hits, answer, citations, and timings.
         """
         timings: Dict[str, float] = {}
-        retrieval_k = top_k or self.config.get("retrieval", {}).get("top_k", 10)
+        
+        # 0. Always retrieve a wide net for the vector search based on config
+        retrieval_k = self.config.get("retrieval", {}).get("top_k", 40)
 
-        # 0. Query rewriting (expand vague queries for better retrieval)
+        # 0.5 Query rewriting (expand vague queries for better retrieval)
         search_query = query
         if (
             self.config.get("retrieval", {}).get("query_rewrite", False)
@@ -308,8 +310,12 @@ class QueryPipeline:
 
         # 3. Rerank (optional) — use rewritten query for better ranking
         reranker = self._get_reranker()
-        with timer("rerank", timings):
-            hits = reranker.rerank(search_query, hits)
+        if reranker.__class__.__name__ != "NoReranker":
+            with timer("rerank", timings):
+                hits = reranker.rerank(search_query, hits, top_k=top_k)
+        else:
+            if top_k is not None:
+                hits = hits[:top_k]
 
         # 3.5 Deduplicate near-identical chunks
         dedup_threshold = self.config.get("retrieval", {}).get(

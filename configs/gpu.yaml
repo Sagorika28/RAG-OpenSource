@@ -38,6 +38,8 @@ generation:
   enabled: true
   provider: ollama
   model: qwen2.5:3b
+  judge_provider: groq
+  judge_model: llama-3.3-70b-versatile
   base_url: http://localhost:11434
   temperature: 0.1
   max_tokens: 1024

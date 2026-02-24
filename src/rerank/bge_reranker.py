@@ -9,7 +9,7 @@ Uses sentence-transformers CrossEncoder with:
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from src.core.device import resolve_torch_device
 from src.core.types import Hit
@@ -44,12 +44,12 @@ class BGEReranker(BaseReranker):
             )
             logger.info(f"Loaded reranker: {self._model_name}")
 
-    def rerank(self, query: str, hits: List[Hit]) -> List[Hit]:
+    def rerank(self, query: str, hits: List[Hit], top_k: Optional[int] = None) -> List[Hit]:
         """
         Rerank hits using the cross-encoder model.
 
         Scores each (query, chunk_text) pair, then sorts descending.
-        Returns at most top_k hits.
+        Returns at most top_k hits (or self._top_k if not provided).
         """
         if not hits:
             return hits
@@ -68,7 +68,8 @@ class BGEReranker(BaseReranker):
 
         reranked = sorted(hits, key=lambda h: h.rerank_score or 0, reverse=True)
 
+        limit = top_k if top_k is not None else self._top_k
         logger.debug(
-            f"Reranked {len(hits)} hits → returning top {self._top_k}"
+            f"Reranked {len(hits)} hits → returning top {limit}"
         )
-        return reranked[: self._top_k]
+        return reranked[:limit]

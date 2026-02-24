@@ -69,7 +69,7 @@ class LLMJudge:
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.config = config or {}
-        self.provider = self.config.get("provider", "groq")
+        self.provider = self.config.get("judge_provider", self.config.get("provider", "groq"))
         self.model = self.config.get("judge_model", "llama-3.1-8b-instant")
         
         if self.provider == "groq":
@@ -147,12 +147,12 @@ class LLMJudge:
                         retry_delay *= 2
                         continue
                     else:
-                        return self._empty_scores(justification="⚠️ Rate limit reached")
+                        return self._empty_scores(justification="Rate limit reached")
                 
                 logger.error(f"LLM Judge (Groq) failed: {e}")
-                return self._empty_scores(justification=f"❌ Groq Error: {str(e)[:50]}")
+                return self._empty_scores(justification=f"Groq Error: {str(e)[:50]}")
         
-        return self._empty_scores(justification="⚠️ Request timed out")
+        return self._empty_scores(justification="Request timed out")
 
     def _evaluate_ollama(self, user_content: str) -> Dict[str, Any]:
         """Call Ollama API for evaluation."""

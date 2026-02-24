@@ -40,7 +40,8 @@ generation:
   enabled: true
   provider: ollama
   model: llama3.1:8b           # Superior local model for technical reasoning
-  judge_model: llama3.1:8b     # Local judge model
+  judge_provider: groq         # Use external fast/free API for unbiased grading
+  judge_model: llama-3.3-70b-versatile  # High intelligence model for scoring
   base_url: http://localhost:11434
   temperature: 0.1
   max_tokens: 1024
