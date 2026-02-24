@@ -20,3 +20,4 @@ pip-delete-this-directory.txt
 # qdrant_data/  
 # data/pdfs/  
 logs/
+RAG_LAYMAN_GUIDE.md

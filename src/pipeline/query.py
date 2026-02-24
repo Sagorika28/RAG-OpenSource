@@ -308,16 +308,13 @@ class QueryPipeline:
                 source=source,
             )
 
-        # 3. Rerank (optional) — use rewritten query for better ranking
+        # 3. Rerank (optional) — we omit top_k here so reranker returns all hits.
         reranker = self._get_reranker()
         if reranker.__class__.__name__ != "NoReranker":
             with timer("rerank", timings):
-                hits = reranker.rerank(search_query, hits, top_k=top_k)
-        else:
-            if top_k is not None:
-                hits = hits[:top_k]
+                hits = reranker.rerank(search_query, hits)
 
-        # 3.5 Deduplicate near-identical chunks
+        # 3.5 Deduplicate near-identical chunks from the FULL reranked list
         dedup_threshold = self.config.get("retrieval", {}).get(
             "dedup_threshold", 0.9
         )
@@ -328,6 +325,10 @@ class QueryPipeline:
                 logger.info(
                     f"Dedup removed {pre_dedup - len(hits)} near-duplicate chunks"
                 )
+
+        # 3.8 Apply the final generation TOP_K limit AFTER deduplication padding
+        final_k = top_k if top_k is not None else self.config.get("reranker", {}).get("top_k", 5)
+        hits = hits[:final_k]
 
         # 4. Generate answer (optional)
         answer = ""

@@ -49,7 +49,7 @@ class BGEReranker(BaseReranker):
         Rerank hits using the cross-encoder model.
 
         Scores each (query, chunk_text) pair, then sorts descending.
-        Returns at most top_k hits (or self._top_k if not provided).
+        Returns the FULL list of reranked hits, ignoring top_k to allow downstream deduplication padding.
         """
         if not hits:
             return hits
@@ -68,8 +68,7 @@ class BGEReranker(BaseReranker):
 
         reranked = sorted(hits, key=lambda h: h.rerank_score or 0, reverse=True)
 
-        limit = top_k if top_k is not None else self._top_k
         logger.debug(
-            f"Reranked {len(hits)} hits → returning top {limit}"
+            f"Reranked {len(hits)} hits"
         )
-        return reranked[:limit]
+        return reranked
